@@ -1,0 +1,92 @@
+{
+    "busConfiguration": "AXI_AXIL_AXI",
+    "dmaIn": {
+        "baseAddress": "0x43c00000"
+    },
+    "dmaOut": {
+        "baseAddress": "0x43c01000"
+    },
+    "accelerator": {
+        "sourceFile": "fpga_isp.v",
+        "topName": "fpga_isp",
+        "baseAddress": "0x43c10000",
+        "params": {
+            "addrWidth": 32,
+            "dataWidth": 32,
+            "maxBurst": 16,
+            "controlAddrWidth": 32,
+            "controlDataWidth": 32,
+            "fifoDepth": 512
+        },
+        "signals": {
+            "clock": "sys_clk",
+            "reset": "sys_rst",
+            "input": {
+                "tdata": "raw_payload_data",
+                "tvalid": "raw_valid",
+                "tready": "raw_ready",
+                "tuser": "raw_first",
+                "tlast": "raw_last"
+            },
+            "output": {
+                "tdata": "rgb_payload_data",
+                "tvalid": "rgb_valid",
+                "tready": "rgb_ready",
+                "tuser": "rgb_first",
+                "tlast": "rgb_last"
+            }
+        },
+        "csr": [
+            {
+                "name": "FPGA_ISP",
+                "type": "storage",
+                "address": "0x43c10000",
+                "fields": [
+                    {
+                        "name": "bgr",
+                        "type": "Bool",
+                        "direction": "Input",
+                        "size": 1
+                    },
+                    {
+                        "name": "pattern",
+                        "type": "UInt",
+                        "direction": "Input",
+                        "size": 2
+                    },
+                    {
+                        "name": "busy",
+                        "type": "Bool",
+                        "direction": "Output",
+                        "size": 1
+                    },
+                    {
+                        "name": "algorithm",
+                        "type": "UInt",
+                        "direction": "Input",
+                        "size": 3
+                    }
+                ]
+            },
+            {
+                "name": "FPGA_ISP_IM",
+                "type": "storage",
+                "address": "0x43c10004",
+                "fields": [
+                    {
+                        "name": "rows",
+                        "type": "UInt",
+                        "direction": "Input",
+                        "size": 13
+                    },
+                    {
+                        "name": "cols",
+                        "type": "UInt",
+                        "direction": "Input",
+                        "size": 13
+                    }
+                ]
+            }
+        ]
+    }
+}

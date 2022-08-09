@@ -1,0 +1,34 @@
+image: debian:bullseye
+
+stages:
+  - build
+  - test
+
+before_script:
+  # sudo is necessary for setup-enviroment.sh script
+  - apt-get --allow-releaseinfo-change update && apt-get install -y --no-install-recommends git build-essential sudo
+  - ./.github/scripts/setup-environment.sh
+  - apt-get install -y imagemagick
+  - git submodule update --init --recursive
+  - mkdir out
+
+test-basic:
+  stage: test
+  script:
+    - make test CONFIG_FILE=examples/configs/config_zvb.json
+    - mv out.png out.rgba out/
+  artifacts:
+    paths:
+      - out/
+
+test-cocotb:
+  stage: test
+  script:
+    - pip3 install -r cocotb-tests/requirements.txt
+    - make cocotb_test CONFIG_FILE=examples/configs/config_zvb.json
+    - mv cocotb-tests/sim_build/AIGTop.fst out/
+  artifacts:
+    paths:
+      - out/
+  only:
+    - merge_requests

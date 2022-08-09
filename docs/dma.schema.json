@@ -1,0 +1,42 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "URL to this schema",
+    "title": "Params Schema",
+    "description": "Params field configuration within AIG system",
+    "type": "object",
+    "properties": {
+        "addrWidth": {
+            "description": "The address width of the DMA I/O buses.",
+            "type": "number",
+            "minimum": 0
+        },
+        "dataWidth": {
+            "description": "Data width of the DMA I/O buses.",
+            "type": "number"
+        },
+        "maxBurst": {
+            "description": "Maximum of bytes that can be transferred with one DMA transaction.",
+            "type": "number"
+        },
+        "controlAddrWidth": {
+            "description": "Address width of the CSR bus.",
+            "type": "number"
+        },
+        "controlDataWidth": {
+            "description": "Data width of the CSR bus.",
+            "type": "number"
+        },
+        "fifoDepth": {
+            "description": "The depth of the DMA buffer.",
+            "type": "number"
+        }
+    },
+    "required": [
+        "addrWidth",
+        "dataWidth",
+        "maxBurst",
+        "controlAddrWidth",
+        "controlDataWidth",
+        "fifoDepth"
+    ]
+}

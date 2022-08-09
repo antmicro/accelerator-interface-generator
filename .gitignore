@@ -1,0 +1,90 @@
+# Created by https://www.toptal.com/developers/gitignore/api/java,sbt,scala,visualstudiocode,obsidian
+# Edit at https://www.toptal.com/developers/gitignore?templates=java,sbt,scala,visualstudiocode,obsidian
+
+### Java ###
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+replay_pid*
+
+### Obsidian ###
+# config dir
+.obsidian/
+
+### Python ###
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+### SBT ###
+# Simple Build Tool
+# http://www.scala-sbt.org/release/docs/Getting-Started/Directories.html#configuring-version-control
+
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+.history
+.cache
+.lib/
+
+### SBT Patch ###
+.bsp/
+
+### Scala ###
+
+.metals/
+.bloop/
+.scalafmt.conf
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+
+### VisualStudioCode ###
+.vscode/*
+
+# Local History for Visual Studio Code
+.history/
+
+# Built Visual Studio Code Extensions
+*.vsix
+
+### VisualStudioCode Patch ###
+# Ignore all local history of files
+.ionide
+
+# Ignore code-workspaces
+*.code-workspace
+
+# End of https://www.toptal.com/developers/gitignore/api/java,sbt,scala,visualstudiocode,obsidian
+
+### chisel3 ###
+*.v
+*.fir
+*.f
+*.anno.json
+
+### cocotb ###
+sim_build/

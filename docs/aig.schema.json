@@ -1,0 +1,248 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "AcceleratorInterfaceGenerator",
+    "description": "Configuration file for the AIG system",
+    "type": "object",
+    "properties": {
+        "busConfiguration": {
+            "description": "I/O and CSR bus of AIG system",
+            "type": "string",
+            "pattern": "^(AXI|WB|AXIS)_(AXIL|WB)_(AXI|WB|AXIS)$"
+        },
+        "dmaIn": {
+            "description": "Input FastVDMA specification. This DMA controls the data flow from main memory to Accelerator.",
+            "baseAddress": {
+                "description": "The physical absolute address at which DMA will be placed.",
+                "type": "string"
+            },
+            "params": {
+                "description": "Input DMA parameters specification",
+                "$ref": "./dma.schema.json"
+            },
+            "required": [
+                "baseAddress"
+            ]
+        },
+        "dmaOut": {
+            "description": "Output FastVDMA specification. This DMA controls the data flow from Accelerator to main memory.",
+            "baseAddress": {
+                "description": "The physical absolute address at which DMA will be placed.",
+                "type": "string"
+            },
+            "params": {
+                "description": "Input DMA parameters specification",
+                "$ref": "./dma.schema.json"
+            },
+            "required": [
+                "baseAddress"
+            ]
+        },
+        "accelerator": {
+            "description": "Accelerator specification",
+            "type": "object",
+            "properties": {
+                "sourceFile": {
+                    "description": "Path to Accelerator's source code in verilog.",
+                    "type": "string"
+                },
+                "topName": {
+                    "description": "Name of the top module in verilog source file.",
+                    "type": "string"
+                },
+                "baseAddress": {
+                    "description": "The physical absolute address at which Accelerator will be placed. Expressed as a hexadecimal value.",
+                    "type": "string"
+                },
+                "params": {
+                    "description": "Accelerator parameters specification.",
+                    "type": "object",
+                    "properties": {
+                        "addrWidth": {
+                            "description": "The address width of IO buses.",
+                            "type": "number",
+                            "minimum": 0
+                        },
+                        "dataWidth": {
+                            "description": "Data width of the IO buses.",
+                            "type": "number"
+                        },
+                        "controlAddrWidth": {
+                            "description": "Address width of the CSR bus.",
+                            "type": "number"
+                        },
+                        "controlDataWidth": {
+                            "description": "Data width of the CSR bus.",
+                            "type": "number"
+                        }
+                    },
+                    "required": [
+                        "addrWidth",
+                        "dataWidth",
+                        "controlAddrWidth",
+                        "controlDataWidth"
+                    ]
+                },
+                "signals": {
+                    "description": "Signal mappings between Accelerator's top level and FastVDMAs. Consists of: AXI-Stream mappings, clock and reset.",
+                    "type": "object",
+                    "properties": {
+                        "clock": {
+                            "description": "Name of the accelerator's clock signal.",
+                            "type": "string"
+                        },
+                        "reset": {
+                            "description": "Name of the accelerator's reset signal.",
+                            "type": "string"
+                        },
+                        "input": {
+                            "description": "Signal mappings between DMA and Accelerator's input AXI-Stream.",
+                            "type": "object",
+                            "properties": {
+                                "tdata": {
+                                    "description": "Name of the Accelerator's input data channel signal.",
+                                    "type": "string"
+                                },
+                                "tvalid": {
+                                    "description": "Name of the Accelerator's signal to be asserted when DMA drives valid input data.",
+                                    "type": "string"
+                                },
+                                "tready": {
+                                    "description": "Name of the signal Accelerator asserts when it's ready to accept the input data.",
+                                    "type": "string"
+                                },
+                                "tuser": {
+                                    "description": "Name of the Accelerator's signal that will be asserted by the DMA to indicate the begining of the transfer.",
+                                    "type": "string"
+                                },
+                                "tlast": {
+                                    "description": "Name of the Accelerator's signal to be asserted to indicate the boundary of the input packet.",
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "tdata",
+                                "tvalid",
+                                "tready",
+                                "tuser",
+                                "tlast"
+                            ]
+                        },
+                        "output": {
+                            "description": "Signal mappings between Accelerator's output AXI-Stream and DMA.",
+                            "type": "object",
+                            "properties": {
+                                "tdata": {
+                                    "description": "Name of the Accelerator's output data channel signal.",
+                                    "type": "string"
+                                },
+                                "tvalid": {
+                                    "description": "Name of the Accelerator's signal that indicates to the DMA the output data is valid.",
+                                    "type": "string"
+                                },
+                                "tready": {
+                                    "description": "Name of the signal Accelerator to be asserted when the DMA is ready to accept the output data.",
+                                    "type": "string"
+                                },
+                                "tuser": {
+                                    "description": "Name of the signal Accelerator asserts to indicate the begining of the transfer of the output data.",
+                                    "type": "string"
+                                },
+                                "tlast": {
+                                    "description": "Name of the signal Accelerator asserts to indicate the boundary of the output packet.",
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "tdata",
+                                "tvalid",
+                                "tready",
+                                "tuser",
+                                "tlast"
+                            ]
+                        }
+                    },
+                    "required": [
+                        "clock",
+                        "reset",
+                        "input",
+                        "output"
+                    ]
+                },
+                "csr": {
+                    "description": "Array of user-defined CSRs.",
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "description": "Name of the register",
+                                "type": "string"
+                            },
+                            "type": {
+                                "description": "Register type. One of storage, clear or status",
+                                "type": "string",
+                                "pattern": "^(storage|clear|status)$",
+                                "address": {
+                                    "description": "The absolute address of this register.",
+                                    "type": "string"
+                                }
+                            },
+                            "fields": {
+                                "description": "Description of individual fields within the register.\nName of each field should be the same as the signal available through accelerator's top module.",
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "name": {
+                                            "description": "Name of the signal to be connected with this field.",
+                                            "type": "string"
+                                        },
+                                        "type": {
+                                            "description": "Chisel type of the field. Can be Bool or UInt.",
+                                            "type": "string",
+                                            "pattern": "^(Bool|UInt)$"
+                                        },
+                                        "direction": {
+                                            "description": "Direction of the CSR field.",
+                                            "type": "string",
+                                            "pattern": "^(Input|Output)$"
+                                        },
+                                        "size": {
+                                            "description": "Field size. Total size of fields within a CSR cannot exceed Accelerator's controlDataWidth.",
+                                            "type": "number",
+                                            "minimum": 1
+                                        }
+                                    },
+                                    "required": [
+                                        "name",
+                                        "type",
+                                        "direction",
+                                        "size"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "name",
+                            "type",
+                            "fields"
+                        ]
+                    }
+                }
+            },
+            "required": [
+                "baseAddress",
+                "topName",
+                "sourceFile",
+                "signals",
+                "params"
+            ]
+        }
+    },
+    "required": [
+        "busConfiguration",
+        "dmaIn",
+        "dmaOut",
+        "accelerator"
+    ]
+}

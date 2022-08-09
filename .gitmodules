@@ -1,0 +1,3 @@
+[submodule "src/fastvdma-chisel"]
+	path = src/fastvdma-chisel
+	url = https://github.com/antmicro/fastvdma.git
