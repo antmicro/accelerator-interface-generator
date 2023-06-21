@@ -6,6 +6,6 @@ DMAs used in this system are from the open source [FastVDMA](https://github.com/
 
 If specified, the Accelerator is equipped with the bus that handles its custom CSRs (the bus could be either Wishbone or AXI Lite).
 
-![[accelerator-interface.png]]
+![accelerator-overview](accelerator-interface.png)
 
 The AIG uses a custom decoder which grants access depended upon `baseAddress` defined in a configuration file.
