@@ -30,3 +30,6 @@ clean:
 	$(SBT) clean
 	rm -f *.v *.fir *.f *anno.json *.rgba *.png
 	rm -frd test_run_dir/
+
+%:
+	sphinx-build -M $@ docs build $(SPHINXOPTS) $(0)

@@ -1,10 +1,15 @@
-The Accelerator Interface Generator aims for configurability and simplicity. It's main purpose was to be able to create a generic accelerator interface that could be used in efficient Deep Learning in IoT.
+# Introduction
 
-The AIG is a vendor independent project that allows to generate a Verilog module that incorporates two DMAs and an user-defined accelerator. The only requirement for the accelerator is compatibility with AXI Stream. AIG supports custom CSRs, which can be defined via configuration file. More on configuration can be found in the [Usage](Usage) section. 
+The Accelerator Interface Generator (AIG) is a vendor independent project aiming to enhance interest and accessibility of computing on edge with FPGA devices. AIG offers a framework that automates the process of developing AI accelerators for different FPGA chips. Given accelerator's source code and its configuration, it incorporates two DMAs, accelerator and custom, user-specified CSRs.
 
-AIG provides functionality to generate example LiteX target boards including said accelerator design.
+The only requirement for the accelerator is  that it is compatible with AXI Stream for I/O operations.
+
+All configuration is declared via configuration file. The comprehensive description can be found under [Configuration](Configuration.md) section. 
+
+AIG provides functionality to generate example LiteX target boards including the accelerator design.
+
 The targets that are currently supported are:
-- Zynq Video Board with Zynq7000 CPU
+- Zynq Video Board with Zynq 7000 SoC
 - Arty A7 with open source RISCV CPU
 
-Apart from that, one can also generate files necessary for Renode-Verilator co-simulation or LiteX simulation, which can be useful in debugging.
+AIG provides a sample cocotb test suite for an example accelerator, which contains configuration-independent definition of `AIGTestInterface` making it easily adaptable to custom use cases.
