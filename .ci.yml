@@ -45,6 +45,7 @@ build-docs:
     - sudo apt-get install -y --no-install-recommends make python3 python3-pip
     - pip3 install -r docs/requirements.txt
     - SPHINXOPTS="-A conf_py_path=$DOCS_DIR/$SOURCEDIR/ -A commit=$CI_BUILD_REF -A branch=$CI_BUILD_REF_NAME" make html
+    - cp docs/*.png build/html 
     - tar cf $CI_DOCS_ARCHIVE -C build/html/ .
   artifacts:
     paths:

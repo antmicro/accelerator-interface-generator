@@ -38,6 +38,7 @@ jobs:
       - name: Build the documentation
         run: |
           SPHINXOPTS="-A conf_py_path=$DOCS_DIR/$SOURCEDIR/ -A commit=$CI_BUILD_REF -A branch=$CI_BUILD_REF_NAME" make html
+          cp docs/*.png build/html
 
       - name: 'Upload artifact: Sphinx HTML'
         uses: actions/upload-artifact@v3
