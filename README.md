@@ -11,7 +11,6 @@ Accelerator Interface Generator is a tool that can connect any FPGA accelerator 
 Given an accelerator source code and configuration file, AIG is able to generate:
 - vendor independent DMA-Accelerator interface
 - LiteX Target
-- Renode-Verilator co-simulation files
 
 ## Supported Configurations
 ---
@@ -31,72 +30,74 @@ In order to use this project, one must provide Accelerator source code (in veril
 Configuration file must be of structure:
 ```json
 {
-    "busConfiguration": <busConfiguration>,
+    "busConfiguration": "busConfiguration",
     
     "DMAIn": {
-        "baseAddress": <dmaInAddr>
+        "baseAddress": "dmaInAddr"
     },
     
     "DMAOut": {
-        "baseAddress": <dmaOutAddr>
+        "baseAddress": "dmaOutAddr"
     },
     
     "Accelerator": {
     
-        "sourceFile": <acceleratorFilename>,
-        "topName": <acceleratorTopModule>,
-        "baseAddress": <AcceleratorAddr>,
+        "sourceFile": "acceleratorFilename",
+        "topName": "acceleratorTopModule",
+        "baseAddress": "AcceleratorAddr",
         
         "params": {
-            "addrWidth": <addrWidth>,
-            "dataWidth": <dataWidth>,
-            "maxBurst": <maxBurst>,
-            "controlAddrWidth": <controlAddrWidth>,
-            "controlDataWidth": <controlDataWidth>,
-            "fifoDepth": <fifoDepth>
+            "addrWidth": "addrWidth",
+            "dataWidth": "dataWidth",
+            "maxBurst": "maxBurst",
+            "controlAddrWidth": "controlAddrWidth",
+            "controlDataWidth": "controlDataWidth",
+            "fifoDepth": "fifoDepth"
         },
         
         "signals": {
-            "clock": <clock>,
-            "reset": <reset>,
+            "clock": "clock",
+            "reset": "reset",
             "input": {
-                "tdata": <tdata>,
-                "tvalid": <tvalid>,
-                "tready": <tready>,
-                "tuser": <tuser>,
-                "tlast": <tlast>
+                "tdata": "tdata",
+                "tvalid": "tvalid",
+                "tready": "tready",
+                "tuser": "tuser",
+                "tlast": "tlast"
             },
             "output": {
-                "tdata": <tdata>,
-                "tvalid": <tvalid>,
-                "tready": <tready>,
-                "tuser": <tuser>,
-                "tlast": <tlast>
+                "tdata": "tdata",
+                "tvalid": "tvalid",
+                "tready": "tready",
+                "tuser": "tuser",
+                "tlast": "tlast"
             }
         },
         
         "csr": [
             {
-                "name": <csrName>,
-                "type": <csrType>,
-                "address": <csrAddress>,
+                "name": "csrName",
+                "type": "csrType",
+                "address": "csrAddress",
                 "fields": [
                     {
-                        "name": <fieldName>,
-                        "type": <fieldType>,
-                        "direction": <fieldDirection>,
-                        "size": <fieldSize>
+                        "name": "fieldName",
+                        "type": "fieldType",
+                        "direction": "fieldDirection",
+                        "size": "fieldSize"
                     },
-                    ...
+                    "..."
                 ]
             },
-            ...
+            "..."
         ]
     }
 }
 ```
 
 One can also precisely specify both DMA parameters by adding `"params"` field in `"DMAIn"` or `"DMAOut"`. 
+
+For more information on configuration see the [documentation](https://antmicro.github.io/accelerator-interface-generator/Configuration.html).
 
 ## Synthesizable AIG verilog
 ---
