@@ -5,6 +5,8 @@
 Introduction
 Overview
 Configuration
-Usage
+SynthesizableVerilog
+CocotbSimulation
+Target
 ```
 
