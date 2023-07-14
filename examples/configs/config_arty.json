@@ -11,10 +11,10 @@
         "topName": "fpga_isp",
         "baseAddress": "0xa0010000",
         "params": {
-            "addrWidth": 30,
+            "addrWidth": 32,
             "dataWidth": 32,
             "maxBurst": 16,
-            "controlAddrWidth": 30,
+            "controlAddrWidth": 32,
             "controlDataWidth": 32,
             "fifoDepth": 512
         },
