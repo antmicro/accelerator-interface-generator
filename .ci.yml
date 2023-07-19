@@ -1,18 +1,27 @@
-image: debian:bullseye
-
 stages:
   - build
   - test
   - deploy
 
-test-basic:
-  stage: test
+.setup_env: &setup_env
+  image: debian:trixie
   before_script:
-    - apt-get --allow-releaseinfo-change update && apt-get install -y --no-install-recommends git build-essential sudo
-    - ./.github/scripts/setup-environment.sh
-    - apt-get install -y imagemagick
+    - export DEBIAN_FRONTEND=noninteractive
+    - apt --allow-releaseinfo-change update && apt install -y --no-install-recommends git build-essential make apt-transport-https curl gnupg default-jdk default-jre
+    - echo "deb https://repo.scala-sbt.org/scalasbt/debian all main" | tee /etc/apt/sources.list.d/sbt.list
+    - echo "deb https://repo.scala-sbt.org/scalasbt/debian /" | tee /etc/apt/sources.list.d/sbt_old.list
+    - curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x2EE0EA64E40A89B84B2DF73499E82A75642AC823" | apt-key add
+    - apt update && apt install -y sbt python3 python3-pip python3.11-venv imagemagick iverilog verilator
+    # Create and activate Python venv
+    - python3 -m venv .venv
+    - source .venv/bin/activate
     - git submodule update --init --recursive
+    - pip3 install -r requirements.txt
     - mkdir out
+
+test-basic:
+  <<: *setup_env
+  stage: test
   script:
     - make test CONFIG_FILE=examples/configs/config_zvb.json
     - mv out.png out.rgba out/
@@ -21,15 +30,9 @@ test-basic:
       - out/
 
 test-cocotb:
+  <<: *setup_env
   stage: test
-  before_script:
-    - apt-get --allow-releaseinfo-change update && apt-get install -y --no-install-recommends git build-essential sudo imagemagick
-    - ./.github/scripts/setup-environment.sh
-    - apt-get install -y imagemagick
-    - git submodule update --init --recursive
-    - mkdir out
   script:
-    - pip3 install -r cocotb-tests/requirements.txt
     - make cocotb_test CONFIG_FILE=examples/configs/config_zvb.json
     - mv sim_build/AIGTop.fst out/
   artifacts:
@@ -39,13 +42,11 @@ test-cocotb:
     - merge_requests
 
 build-docs:
+  <<: *setup_env
   stage: build
   script:
-    - apt-get --allow-releaseinfo-change update && apt-get install -y --no-install-recommends git build-essential sudo
-    - sudo apt-get install -y --no-install-recommends make python3 python3-pip
-    - pip3 install -r docs/requirements.txt
     - SPHINXOPTS="-A conf_py_path=$DOCS_DIR/$SOURCEDIR/ -A commit=$CI_BUILD_REF -A branch=$CI_BUILD_REF_NAME" make html
-    - cp docs/*.png build/html 
+    - cp docs/*.png build/html
     - tar cf $CI_DOCS_ARCHIVE -C build/html/ .
   artifacts:
     paths:
@@ -53,12 +54,13 @@ build-docs:
       - $CI_DOCS_ARCHIVE
 
 deploy-docs:
+  image: $CI_DOCS_DOCKER_IMAGE
   variables:
     GIT_STRATEGY: none
   dependencies:
     - build-docs
   stage: deploy
-  tags: ['docs']
+  tags: ["docs"]
   script: echo 'Deploying docs'
   artifacts:
     paths:

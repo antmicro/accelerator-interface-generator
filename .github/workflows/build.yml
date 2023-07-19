@@ -6,7 +6,7 @@ jobs:
   cocotb_test:
     name: Run Cocotb test
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -15,12 +15,15 @@ jobs:
 
       - name: Setup environment
         run: |
-          ./.github/scripts/setup-environment.sh
-          pip3 install -r cocotb-tests/requirements.txt
+          export DEBIAN_FRONTEND=noninteractive
+          sudo apt --allow-releaseinfo-change update && sudo apt install -y --no-install-recommends apt-transport-https curl gnupg graphicsmagick-imagemagick-compat default-jdk default-jre
+          echo "deb https://repo.scala-sbt.org/scalasbt/debian all main" | sudo tee /etc/apt/sources.list.d/sbt.list
+          echo "deb https://repo.scala-sbt.org/scalasbt/debian /" | sudo tee /etc/apt/sources.list.d/sbt_old.list
+          curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x2EE0EA64E40A89B84B2DF73499E82A75642AC823" | sudo apt-key add
+          sudo apt update && sudo apt install -y sbt iverilog verilator imagemagick
 
       - name: Run Cocotb test
         run: make cocotb_test CONFIG_FILE=examples/configs/config_zvb.json
-
 
   docs:
     runs-on: ubuntu-latest
@@ -30,17 +33,17 @@ jobs:
 
       - name: Setup environment
         run: |
+          export DEBIAN_FRONTEND=noninteractive
           sudo apt update -qq
           sudo apt install -y make python3 python3-pip
-          pip3 install -r docs/requirements.txt
-          
+          pip3 install -r requirements.txt
 
       - name: Build the documentation
         run: |
           SPHINXOPTS="-A conf_py_path=$DOCS_DIR/$SOURCEDIR/ -A commit=$CI_BUILD_REF -A branch=$CI_BUILD_REF_NAME" make html
           cp docs/*.png build/html
 
-      - name: 'Upload artifact: Sphinx HTML'
+      - name: "Upload artifact: Sphinx HTML"
         uses: actions/upload-artifact@v3
         with:
           name: Documentation-HTML
