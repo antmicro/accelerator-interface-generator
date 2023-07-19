@@ -5,9 +5,7 @@ If `CONFIG_FILE` is not specified, the default configuration file is `config.jso
 Running:
 
 ```
-
 make verilog
-
 ```
 
 
@@ -17,7 +15,5 @@ will generate remaining chisel files (the Accelerator definition, AcceleratorInt
 To specify a different configuration file:
 
 ```
-
 make verilog CONFIG_FILE=<path_to_config>
-
 ```
