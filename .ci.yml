@@ -31,8 +31,9 @@ test-cocotb:
   script:
     - pip3 install -r cocotb-tests/requirements.txt
     - make cocotb_test CONFIG_FILE=examples/configs/config_zvb.json
-    - mv cocotb-tests/sim_build/AIGTop.fst out/
+    - mv sim_build/AIGTop.fst out/
   artifacts:
+    expire_in: 1 week
     paths:
       - out/
   only:
