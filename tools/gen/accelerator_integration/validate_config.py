@@ -105,7 +105,7 @@ def validate_csrs(csrs: dict, data_width: int) -> None:
                 f"Invalid type for register {reg_type}. Must be one of {_reg_type_dict.keys()}")
 
         total_reg_size = sum([f["size"] for f in reg_fields])
-        if total_reg_size >= data_width:
+        if total_reg_size > data_width:
             raise ValueError(
                 f"Total {reg_name} register size: {total_reg_size} exceeds data width: {data_width}")
 
