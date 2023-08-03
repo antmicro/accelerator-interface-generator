@@ -1,0 +1,33 @@
+{
+    "busConfiguration": "AXI_AXIL_AXI",
+    "accelerator": {
+        "sourceFile": "axis_fifo.v",
+        "topName": "axis_fifo",
+        "params": {
+            "addrWidth": 32,
+            "dataWidth": 32,
+            "maxBurst": 16,
+            "controlAddrWidth": 32,
+            "controlDataWidth": 32,
+            "fifoDepth": 512
+        },
+        "signals": {
+            "clock": "clk",
+            "reset": "rst",
+            "input": {
+                "tdata": "in_axis_tdata",
+                "tvalid": "in_axis_tvalid",
+                "tready": "in_axis_tready",
+                "tuser": "in_axis_tuser",
+                "tlast": "in_axis_tlast"
+            },
+            "output": {
+                "tdata": "out_axis_tdata",
+                "tvalid": "out_axis_tvalid",
+                "tready": "out_axis_tready",
+                "tuser": "out_axis_tuser",
+                "tlast": "out_axis_tlast"
+            }
+        }
+    }
+}
