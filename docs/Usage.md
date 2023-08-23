@@ -64,4 +64,4 @@ await aig.write_csr(DMARegisterMap.InterruptMask + base_addr_dma_in, 0x3)
 await aig.write_csr(DMARegisterMap.Ctrl + base_addr_dma_in, 0xf)
 ```
 
-Here's more detailed description on [FastVMDA's CSRs](https://github.com/antmicro/fastvdma/blob/main/doc/csr.md).
+Here's more detailed description on [FastVMDA's CSRs](https://antmicro.github.io/fastvdma/RegisterMap.html).
