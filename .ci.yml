@@ -19,6 +19,34 @@ stages:
     - pip3 install -r requirements.txt
     - mkdir out
 
+build-example-arty:
+  <<: *setup_env
+  stage: build
+  script:
+    - make target
+    - mv aig_generated_target.py *.v out/
+  variables:
+    TARGET: digilent_arty
+    CONFIG_FILE: examples/configs/config_arty.json
+  artifacts:
+    name: "$CI_JOB_NAME"
+    paths:
+      - out/
+
+build-example-zvb:
+  <<: *setup_env
+  stage: build
+  script:
+    - make target
+    - mv aig_generated_target.py *.v out/
+  variables:
+    TARGET: antmicro_zynq_video_board
+    CONFIG_FILE: examples/configs/config_zvb.json
+  artifacts:
+    name: "$CI_JOB_NAME"
+    paths:
+      - out/
+
 test-basic:
   <<: *setup_env
   stage: test
