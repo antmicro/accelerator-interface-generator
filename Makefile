@@ -47,7 +47,7 @@ setup:
 	python3 tools/gen/accelerator_integration/aig_gen.py $(CONFIG_ARG)
 
 test: setup
-	$(SBT) "Test / testOnly -t *$(TB)"
+	$(SBT) test
 	convert -size $(WIDTH)x$(HEIGHT) -depth 8 out.rgba -alpha off out.png
 
 cocotb_test: verilog
