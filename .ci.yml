@@ -56,6 +56,7 @@ test-basic:
   variables:
     AIG_CONFIG: examples/configs/config_zvb.json
   artifacts:
+    name: "$CI_JOB_NAME"
     paths:
       - out/
 
@@ -68,6 +69,7 @@ test-cocotb:
   variables:
     AIG_CONFIG: examples/configs/config_zvb.json
   artifacts:
+    name: "$CI_JOB_NAME"
     paths:
       - out/
   only:
