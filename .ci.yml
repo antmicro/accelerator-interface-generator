@@ -26,8 +26,8 @@ build-example-arty:
     - make target
     - mv aig_generated_target.py *.v out/
   variables:
-    TARGET: digilent_arty
-    CONFIG_FILE: examples/configs/config_arty.json
+    AIG_CONFIG: examples/configs/config_arty.json
+    TARGET_CONFIG: examples/target_configs/config_arty.json
   artifacts:
     name: "$CI_JOB_NAME"
     paths:
@@ -40,8 +40,8 @@ build-example-zvb:
     - make target
     - mv aig_generated_target.py *.v out/
   variables:
-    TARGET: antmicro_zynq_video_board
-    CONFIG_FILE: examples/configs/config_zvb.json
+    AIG_CONFIG: examples/configs/config_arty.json
+    TARGET_CONFIG: examples/target_configs/config_zvb.json
   artifacts:
     name: "$CI_JOB_NAME"
     paths:
@@ -51,8 +51,10 @@ test-basic:
   <<: *setup_env
   stage: test
   script:
-    - make test AIG_CONFIG=examples/configs/config_zvb.json
+    - make test
     - mv out.png out.rgba out/
+  variables:
+    AIG_CONFIG: examples/configs/config_zvb.json
   artifacts:
     paths:
       - out/
@@ -61,8 +63,10 @@ test-cocotb:
   <<: *setup_env
   stage: test
   script:
-    - make cocotb_test AIG_CONFIG=examples/configs/config_zvb.json
+    - make cocotb_test
     - mv sim_build/AIGTop.fst out/
+  variables:
+    AIG_CONFIG: examples/configs/config_zvb.json
   artifacts:
     paths:
       - out/
