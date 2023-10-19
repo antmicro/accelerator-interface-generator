@@ -20,6 +20,18 @@ CONFIG_ARG = $(if $(CONFIG_FILE),--config-path $(CONFIG_FILE),)
 
 ###############################################################################
 
+# File paths ##################################################################
+
+SCALA_SRC_DIR = $(PWD)/src/main/scala
+INTEGRATION_DIR = $(SCALA_SRC_DIR)/AcceleratorIntegration
+CSR_DIR = $(SCALA_SRC_DIR)/CSR/CustomCSRDefinition
+INTEGRATION_FILES = $(INTEGRATION_DIR)/Accelerator.scala \
+					$(INTEGRATION_DIR)/AcceleratorIntegration.scala \
+					$(CSR_DIR)/CSRMap.scala \
+					$(CSR_DIR)/RegistersDefinition.scala
+
+###############################################################################
+
 # Test image vars #############################################################
 
 WIDTH=600
@@ -45,6 +57,8 @@ clean:
 	$(SBT) clean
 	rm -f *.v *.fir *.f *anno.json *.rgba *.png
 	rm -frd test_run_dir/
+	rm -f $(INTEGRATION_FILES)
+	rm -df $(INTEGRATION_DIR)
 
 %:
 	sphinx-build -M $@ docs build $(SPHINXOPTS) $(0)
