@@ -1,22 +1,15 @@
 import argparse
 import os
 
-ROOT_DIR = os.path.join(os.path.dirname(
-    os.path.abspath(__file__)), '../../../')
+ROOT_DIR = os.path.dirname(__file__).removesuffix('/tools/gen/accelerator_integration')
+SCALA_SRC_PATH = os.path.join(ROOT_DIR, 'src/main/scala')
 
 DEF_CONFIG_PATH = os.path.join(ROOT_DIR, 'config.json')
-
 DEF_INTEGRATION_PATH = os.path.join(
-    ROOT_DIR, 'src/main/scala/AcceleratorIntegration/AcceleratorIntegration.scala')
-
-DEF_WRAPPER_PATH = os.path.join(
-    ROOT_DIR, 'src/main/scala/AcceleratorIntegration/Accelerator.scala')
-
-DEF_CSR_MAP_PATH = os.path.join(
-    ROOT_DIR, 'src/main/scala/CSR/CustomCSRDefinition/CSRMap.scala')
-
-DEF_REG_DEF_PATH = os.path.join(
-    ROOT_DIR, 'src/main/scala/CSR/CustomCSRDefinition/RegistersDefinition.scala')
+    SCALA_SRC_PATH, 'AcceleratorIntegration/AcceleratorIntegration.scala')
+DEF_WRAPPER_PATH = os.path.join(SCALA_SRC_PATH, 'AcceleratorIntegration/Accelerator.scala')
+DEF_CSR_MAP_PATH = os.path.join(SCALA_SRC_PATH, 'CSR/CustomCSRDefinition/CSRMap.scala')
+DEF_REG_DEF_PATH = os.path.join(SCALA_SRC_PATH, 'CSR/CustomCSRDefinition/RegistersDefinition.scala')
 
 BR = "\n\n"
 

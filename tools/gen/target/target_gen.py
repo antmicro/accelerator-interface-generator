@@ -47,8 +47,7 @@ class AIGTargetOnZVB(AIGTarget):
 
 
 if __name__ == "__main__":
-    ROOT_DIR = os.path.join(os.path.dirname(
-        os.path.abspath(__file__)), '../../../')
+    ROOT_DIR = os.path.dirname(__file__).removesuffix('/tools/gen/target')
     DEF_CONFIG_PATH = os.path.join(ROOT_DIR, 'config.json')
     DEF_TARGET_PATH = os.path.join(ROOT_DIR, 'aig_generated_target.py')
 
