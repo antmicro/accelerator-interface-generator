@@ -16,7 +16,7 @@ CONFIG_ARG = $(if $(CONFIG_FILE),--config-path $(CONFIG_FILE),)
 verilog: setup
 	$(SBT) "runMain $(MAIN)"
 
-setup: 
+setup:
 	python3 tools/gen/accelerator_integration/aig_gen.py $(CONFIG_ARG)
 
 test: setup
