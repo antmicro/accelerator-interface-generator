@@ -33,3 +33,5 @@ clean:
 
 %:
 	sphinx-build -M $@ docs build $(SPHINXOPTS) $(0)
+
+.PHONY: setup verilog cocotb_test
