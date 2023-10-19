@@ -213,7 +213,7 @@ async def reset(dut):
 
 @cocotb.test()
 async def run_test(dut):
-    ROOT_DIR = os.path.join(os.path.abspath(os.getcwd()), "../..")
+    ROOT_DIR = os.path.dirname(__file__).removesuffix('/cocotb-tests')
     width = 600
     height = 398
     CLK_PERIOD = 2
@@ -288,7 +288,7 @@ async def run_test(dut):
 
 
 def test_aig():
-    ROOT_DIR = os.path.join(os.path.abspath(os.getcwd()), "..")
+    ROOT_DIR = os.path.dirname(__file__).removesuffix('/cocotb-tests')
     TEST_DIR = os.path.abspath(os.getcwd())
     module = "test_aig_full"
     toplevel = "AIGTop"
