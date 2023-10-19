@@ -33,7 +33,6 @@ test-cocotb:
     - make cocotb_test CONFIG_FILE=examples/configs/config_zvb.json
     - mv sim_build/AIGTop.fst out/
   artifacts:
-    expire_in: 1 week
     paths:
       - out/
   only:
