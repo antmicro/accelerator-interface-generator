@@ -1,17 +1,32 @@
-SBT?=sbt
-MAIN?=AIG.AcceleratorDriver
+# SBT parameters ##############################################################
 
 SBT?=sbt
+MAIN?=AIG.AcceleratorDriver
 TB=ControllerSpec
+
+###############################################################################
+
+# Env var for FastVDMA ########################################################
+
+TAG := $(shell cd src/fastvdma-chisel && git describe --tags --abbrev=0)
+export TAG
+
+###############################################################################
+
+# Integration generation parameters ###########################################
+
+CONFIG_FILE ?= "config.json"
+CONFIG_ARG = $(if $(CONFIG_FILE),--config-path $(CONFIG_FILE),)
+
+###############################################################################
+
+# Test image vars #############################################################
 
 WIDTH=600
 HEIGHT=398
 IMG=test-img.gray
 
-TAG := $(shell cd src/fastvdma-chisel && git describe --tags --abbrev=0)
-export TAG
-CONFIG_FILE ?= "config.json"
-CONFIG_ARG = $(if $(CONFIG_FILE),--config-path $(CONFIG_FILE),)
+###############################################################################
 
 verilog: setup
 	$(SBT) "runMain $(MAIN)"
