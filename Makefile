@@ -24,7 +24,7 @@ test: setup
 	convert -size $(WIDTH)x$(HEIGHT) -depth 8 out.rgba -alpha off out.png
 
 cocotb_test: verilog
-	cd cocotb-tests && pytest -k test_aig_full
+	pytest cocotb-tests
 
 clean:
 	$(SBT) clean
