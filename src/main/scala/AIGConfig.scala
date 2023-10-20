@@ -5,7 +5,7 @@ import play.api.libs.json._
 import java.io.File
 import chisel3._
 import AIG.CSR.{BaseRegister, StorageRegister, ClearRegister, StatusRegister}
-import AIG.CSR.CustomCSRDefinition.{RegisterBase, FPGA_ISP, FPGA_ISP_IM}
+import AIG.CSR.CustomCSRDefinition._
 
 case class CSRField(
     name: String,
