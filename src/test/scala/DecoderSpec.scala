@@ -54,7 +54,16 @@ class DecoderTest(
 
   val main_axil = new AxiLiteMasterBfm(c.io.control, println)
 
+  // Intializing write at the AXI4LiteCSR that provides interface
+  // between the AIGDecoder and the outside of the AIG system
+  // (usually connected to the system bus)
   main_axil.writePush(addr, 0xbeef)
+
+  // After requesting write a at the main AXI4LiteCSR, the write
+  // should be forwarded to one of the CSR buses (FastVDMAs'
+  // or Accelerator's) based on the address of the request.
+  // This will be confirmed via transaction appearing on the `aw`
+  // channel of the associated bus.
   waitRange(expectedTargetBus.aw.awaddr, addr, min_steps, max_steps)
 }
 
