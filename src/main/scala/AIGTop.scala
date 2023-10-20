@@ -79,6 +79,7 @@ class AIGTop extends Module {
   irq_out(1) <> dmaOut.io.irq.readerDone
   io.irq_dmaOut <> irq_out.asUInt
 
+  // Ignore unused IOs
   dmaIn.io.sync <> DontCare
   dmaOut.io.sync <> DontCare
 }
