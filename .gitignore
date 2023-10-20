@@ -81,7 +81,10 @@ project/plugins/project/
 # End of https://www.toptal.com/developers/gitignore/api/java,sbt,scala,visualstudiocode,obsidian
 
 ### chisel3 ###
+# Ignore verilog files
 *.v
+# Except for provided examples
+!examples/resources/
 *.fir
 *.f
 *.anno.json
