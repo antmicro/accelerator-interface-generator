@@ -89,13 +89,13 @@ class AXI4LiteCSRDecoder(addrWidth: Int, dataWidth: Int)
   val awaddr = RegInit(0.U(addrWidth.W))
   val araddr = RegInit(0.U(addrWidth.W))
 
-  def connectWrite(axilite1: AXI4Lite, axilite2: AXI4Lite) {
+  def connectWrite(axilite1: AXI4Lite, axilite2: AXI4Lite): Unit = {
     axilite1.aw <> axilite2.aw
     axilite1.w <> axilite2.w
     axilite1.b <> axilite2.b
   }
 
-  def connectRead(axilite1: AXI4Lite, axilite2: AXI4Lite) {
+  def connectRead(axilite1: AXI4Lite, axilite2: AXI4Lite): Unit = {
     axilite1.ar <> axilite2.ar
     axilite1.r <> axilite2.r
   }
