@@ -34,6 +34,7 @@ object AIGConfigUtils {
   private val dmaInConfigString = s"${reader}_${csr}_AXIS"
   private val dmaOutConfigString = s"AXIS_${csr}_${writer}"
 
+  private val dmaRegCount = 16
   private def getDMAConfig(name: String, busConfig: String): DMAConfig = {
     val pathToParams =
       if ((fileContent \ name \ "params").isDefined)
@@ -69,7 +70,7 @@ object AIGConfigUtils {
       writer4KBarrier,
       controlDataWidth,
       controlAddrWidth,
-      16,
+      dmaRegCount,
       fifoDepth
     )
   }
