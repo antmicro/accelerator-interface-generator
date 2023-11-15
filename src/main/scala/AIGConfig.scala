@@ -88,7 +88,7 @@ object AIGConfigUtils {
   val baseDMAInAddr = s"h$baseDMAInAddrStr".U(32.W)
   val baseDMAOutAddr = s"h$baseDMAOutAddrStr".U(32.W)
   val dataWidth = dmaIn.controlDataWidth
-  val csrSize = (fileContent \ "accelerator" \ "csr").get
+  val customCSRSize = (fileContent \ "accelerator" \ "csr").get
     .as[List[JsValue]]
     .length * dataWidth
 }

@@ -15,7 +15,7 @@ import DMAController.Bus._
 import DMAController.Frontend._
 
 import AIG.CSR.CustomCSRDefinition._
-import AIGConfigUtils.csrSize
+import AIGConfigUtils.customCSRSize
 
 class AIGTop extends Module {
   val (in_reader, in_csr, in_writer) = AIGConfigUtils.dmaIn.getBusConfig()
@@ -46,7 +46,7 @@ class AIGTop extends Module {
   val accd = Module(AIGDecoder(in_csr, controlAddrWidth, controlDataWidth))
 
   val csrBus = Module(AIGBus(in_csr, controlAddrWidth))
-  val csrWrapper = Module(new CustomCSRWrapper(controlDataWidth, csrSize))
+  val csrWrapper = Module(new CustomCSRWrapper(controlDataWidth, customCSRSize))
 
   // Connect Accelerator's CSRs
   accelerator.io.csrs <> csrWrapper.io.csrs

@@ -7,7 +7,7 @@ import AIG.AIGConfig.AIGConfigUtils.{
   baseAccAddr,
   baseDMAInAddr,
   baseDMAOutAddr,
-  csrSize
+  customCSRSize
 }
 
 class WishboneCSRDecoder(addrWidth: Int, dataWidth: Int)
@@ -19,17 +19,17 @@ class WishboneCSRDecoder(addrWidth: Int, dataWidth: Int)
 
   val sNone :: sIn :: sOut :: sAcc :: Nil = Enum(4)
 
-  def isCsr(addr_i: UInt, baseAddr: UInt, csrSize: UInt): Bool = {
-    (addr_i >= baseAddr) && (addr_i < (baseAddr + csrSize))
+  def isCsr(addr_i: UInt, baseAddr: UInt, customCSRSize: UInt): Bool = {
+    (addr_i >= baseAddr) && (addr_i < (baseAddr + customCSRSize))
   }
   def isCsrIn(addr_i: UInt): Bool = {
-    isCsr(addr_i, addrIn, csrSize.U)
+    isCsr(addr_i, addrIn, customCSRSize.U)
   }
   def isCsrOut(addr_i: UInt): Bool = {
-    isCsr(addr_i, addrOut, csrSize.U)
+    isCsr(addr_i, addrOut, customCSRSize.U)
   }
   def isCsrAcc(addr_i: UInt): Bool = {
-    isCsr(addr_i, addrAcc, csrSize.U)
+    isCsr(addr_i, addrAcc, customCSRSize.U)
   }
 
   val io = IO(new Bundle {

@@ -5,13 +5,13 @@ import chisel3.util._
 import DMAController.DMAConfig._
 import DMAController.Frontend.{Bus, CSRBus, AXI4LiteCSR}
 import DMAController.Bus._
-import AIG.AIGConfig.AIGConfigUtils.{baseAccAddr, baseDMAInAddr, baseDMAOutAddr, csrSize}
+import AIG.AIGConfig.AIGConfigUtils.{baseAccAddr, baseDMAInAddr, baseDMAOutAddr, customCSRSize}
 
 class AXI4LiteCSRDecoder(addrWidth: Int, dataWidth: Int)
     extends AIGDecoder[AXI4Lite] {
 
-  def isCsr(addr: UInt, baseAddr: UInt, csrSize: UInt): Bool = {
-    (addr >= baseAddr) && (addr < (baseAddr + csrSize))
+  def isCsr(addr: UInt, baseAddr: UInt, customCSRSize: UInt): Bool = {
+    (addr >= baseAddr) && (addr < (baseAddr + customCSRSize))
   }
 
   def isReadOver(axiControl: AXI4Lite): Bool = {
@@ -103,18 +103,18 @@ class AXI4LiteCSRDecoder(addrWidth: Int, dataWidth: Int)
   val busReadMux = MuxCase(
     sNone,
     Array(
-      isCsr(araddr, baseCsrAddrOut, csrSize.U) -> sOut,
-      isCsr(araddr, baseCsrAddrIn, csrSize.U) -> sIn,
-      isCsr(araddr, baseCsrAddrAcc, csrSize.U) -> sAcc
+      isCsr(araddr, baseCsrAddrOut, customCSRSize.U) -> sOut,
+      isCsr(araddr, baseCsrAddrIn, customCSRSize.U) -> sIn,
+      isCsr(araddr, baseCsrAddrAcc, customCSRSize.U) -> sAcc
     )
   )
 
   val busWriteMux = MuxCase(
     sNone,
     Array(
-      isCsr(awaddr, baseCsrAddrOut, csrSize.U) -> sOut,
-      isCsr(awaddr, baseCsrAddrIn, csrSize.U) -> sIn,
-      isCsr(awaddr, baseCsrAddrAcc, csrSize.U) -> sAcc
+      isCsr(awaddr, baseCsrAddrOut, customCSRSize.U) -> sOut,
+      isCsr(awaddr, baseCsrAddrIn, customCSRSize.U) -> sIn,
+      isCsr(awaddr, baseCsrAddrAcc, customCSRSize.U) -> sAcc
     )
   )
 
