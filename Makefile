@@ -17,6 +17,8 @@ export TAG
 
 CONFIG_FILE ?= "config.json"
 CONFIG_ARG = $(if $(CONFIG_FILE),--config-path $(CONFIG_FILE),)
+FREQ_ARG = $(if $(FREQ), --freq $(FREQ),)
+AIG_SIZE_ARG = $(if $(AIG_SIZE), --aig-size $(AIG_SIZE),)
 
 ###############################################################################
 
@@ -52,6 +54,9 @@ test: setup
 
 cocotb_test: verilog
 	pytest cocotb-tests
+
+target: verilog
+	python3 tools/gen/target/target_gen.py --config $(CONFIG_FILE) --target $(TARGET)$(AIG_SIZE_ARG)$(FREQ_ARG)
 
 clean:
 	$(SBT) clean
