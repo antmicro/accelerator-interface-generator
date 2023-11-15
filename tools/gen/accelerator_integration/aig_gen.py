@@ -114,7 +114,8 @@ def def_object(name: str, parameters: list[str] = [], parent_name: str = "", con
     params = ""
     if def_size > 100:
         params = "(\n" + indent(isize+4) + params_inner + "\n)"
-    elif len(parameters) > 0:
+    # Case classes in scala require parenthesis even if parameter list is empty
+    elif len(parameters) > 0 or object_type == 'case class':
         params = "(" + params_inner + ")"
     return f"{indent(isize, ichar)}{object_type} {name}{params}{extension}{fmt_content}\n"
 

@@ -106,11 +106,13 @@ def gen_wrapper(config_path: str, wrapper_path: str) -> None:
         signal_defs += "\n".join(out_signals)
 
         # Define custom CSR signals
-        csrs = acc["csr"]
-        for csr in csrs:
-            signals = [define_signal(field["name"], field["direction"],
-                                     field["type"], field["size"]) for field in csr["fields"]]
-            signal_defs += BR + "\n".join(signals)
+        if 'csr' in acc:
+            csrs = acc["csr"]
+
+            for csr in csrs:
+                signals = [define_signal(field["name"], field["direction"],
+                                         field["type"], field["size"]) for field in csr["fields"]]
+                signal_defs += BR + "\n".join(signals)
         io = def_io(signal_defs)
         add_resource = f'{indent(2)}addResource("{f"{source_file}"}")'
         class_content = "\n".join([override_name, io, add_resource])

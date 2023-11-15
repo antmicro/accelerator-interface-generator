@@ -182,9 +182,13 @@ def gen_integration(config_path: str, integration_path: str) -> None:
                    "DMAController.Frontend._", "DMAController.Bus.AXIStream", "AIG.CSR._",
                    "AIG.AIGConfig.AIGConfigUtils", "AIG.CSR.CustomCSRDefinition._"]
 
+        connect_csr = ''
+        if 'csr' in acc:
+            connect_csr = connect_csrs(acc["csr"])
+
         head = def_package("AIG.AcceleratorIntegration") + def_imports(imports)
         content = BR.join([get_io(), init_acc(signals), connect_input_axis(
-            signals["input"]), connect_output_axis(signals["output"]), connect_csrs(acc["csr"])])
+            signals["input"]), connect_output_axis(signals["output"]), connect_csr])
 
         fout.write(head + def_class("AcceleratorIntegration",
                    ["dataWidth: Int"], "Module", content))

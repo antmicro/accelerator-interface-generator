@@ -3,12 +3,7 @@ package AIG.Decoder
 import chisel3._
 import chisel3.util._
 import DMAController.Bus.WishboneSlave
-import AIG.AIGConfig.AIGConfigUtils.{
-  baseAccAddr,
-  baseDMAInAddr,
-  baseDMAOutAddr,
-  customCSRSize
-}
+import AIG.AIGConfig.AIGConfigUtils._
 
 class WishboneCSRDecoder(addrWidth: Int, dataWidth: Int)
     extends AIGDecoder[WishboneSlave] {
@@ -35,7 +30,10 @@ class WishboneCSRDecoder(addrWidth: Int, dataWidth: Int)
   val io = IO(new Bundle {
     val controlIn = Flipped(new WishboneSlave(addrWidth, dataWidth))
     val controlOut = Flipped(new WishboneSlave(addrWidth, dataWidth))
-    val controlAcc = Flipped(new WishboneSlave(addrWidth, dataWidth))
+    val controlAcc =
+      if (accHasCSR)
+        Some(Flipped(new WishboneSlave(addrWidth, dataWidth)))
+      else None
     val control = new WishboneSlave(addrWidth, dataWidth)
   })
 
@@ -73,12 +71,12 @@ class WishboneCSRDecoder(addrWidth: Int, dataWidth: Int)
       Array(
         isOut -> io.controlOut.dat_o,
         isIn -> io.controlIn.dat_o,
-        isAcc -> io.controlAcc.dat_o
+        isAcc -> io.controlAcc.get.dat_o
       )
     )
 
   io.control.ack_o := (state === sAwaitAck) &&
-    (io.controlIn.ack_o & isIn | io.controlOut.ack_o & isOut | io.controlAcc.ack_o & isAcc)
+    (io.controlIn.ack_o & isIn | io.controlOut.ack_o & isOut | io.controlAcc.get.ack_o & isAcc)
 
   switch(state) {
     is(sIdle) {
@@ -109,12 +107,14 @@ class WishboneCSRDecoder(addrWidth: Int, dataWidth: Int)
   io.controlOut.sel_i := sel_i
   io.controlOut.dat_i := io.control.dat_i
 
-  io.controlAcc.adr_i := addr_i & 0xff.U
-  io.controlAcc.stb_i := stb_i & isAcc
-  io.controlAcc.cyc_i := cyc_i & isAcc
-  io.controlAcc.we_i := we_i & isAcc
-  io.controlAcc.sel_i := sel_i
-  io.controlAcc.dat_i := io.control.dat_i
+  if (accHasCSR) {
+    io.controlAcc.get.adr_i := addr_i & 0xff.U
+    io.controlAcc.get.stb_i := stb_i & isAcc
+    io.controlAcc.get.cyc_i := cyc_i & isAcc
+    io.controlAcc.get.we_i := we_i & isAcc
+    io.controlAcc.get.sel_i := sel_i
+    io.controlAcc.get.dat_i := io.control.dat_i
+  }
 
   io.controlIn.adr_i := addr_i & 0xff.U
   io.controlIn.stb_i := stb_i & isIn

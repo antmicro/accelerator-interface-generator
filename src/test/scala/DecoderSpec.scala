@@ -92,7 +92,11 @@ class DecoderSpec extends AnyFlatSpec with ChiselScalatestTester {
             case x if x contains "DMAOut" =>
               new DecoderTest(c, addr, c.io.controlOut)
             case x if x contains "Accelerator" =>
-              new DecoderTest(c, addr, c.io.controlAcc)
+              c.io.controlAcc match {
+                case Some(csrBus) => new DecoderTest(c, addr, csrBus)
+                case None =>
+                  println("No custom CSR specified. Skipping Accelerator case.")
+              }
           }
         )
 }

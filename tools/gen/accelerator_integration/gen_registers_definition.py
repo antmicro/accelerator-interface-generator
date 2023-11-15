@@ -40,13 +40,16 @@ def gen_reg_def(config_path: str, reg_def_path: str) -> None:
     """
     with open(config_path, 'r') as conf, open(reg_def_path, 'w') as fout:
         config = json.load(conf)
-        csrs = config["accelerator"]["csr"]
 
         out = def_package("AIG.CSR.CustomCSRDefinition")
         out += def_imports(["chisel3._"])
         out += def_class("RegisterBase", [], "Bundle", "", "abstract") + "\n"
 
-        ordered_csrs = sorted(csrs, key=lambda x: x["address"])
+        csrs, ordered_csrs = [], []
+        if 'csr' in config['accelerator']:
+            csrs = config["accelerator"]["csr"]
+            ordered_csrs = sorted(csrs, key=lambda x: x["address"])
+
         csr_bundle_entries = []
         for csr in ordered_csrs:
             csr_name = csr["name"]

@@ -5,7 +5,7 @@ import chisel3.util._
 import DMAController.DMAConfig._
 import DMAController.Frontend.{Bus, CSRBus, AXI4LiteCSR}
 import DMAController.Bus._
-import AIG.AIGConfig.AIGConfigUtils.{baseAccAddr, baseDMAInAddr, baseDMAOutAddr, customCSRSize}
+import AIG.AIGConfig.AIGConfigUtils._
 
 class AXI4LiteCSRDecoder(addrWidth: Int, dataWidth: Int)
     extends AIGDecoder[AXI4Lite] {
@@ -29,7 +29,8 @@ class AXI4LiteCSRDecoder(addrWidth: Int, dataWidth: Int)
   val io = IO(new Bundle {
     val controlIn = new AXI4Lite(addrWidth, dataWidth)
     val controlOut = new AXI4Lite(addrWidth, dataWidth)
-    val controlAcc = new AXI4Lite(addrWidth, dataWidth)
+    val controlAcc =
+      if (accHasCSR) Some(new AXI4Lite(addrWidth, dataWidth)) else None
     val control = Flipped(new AXI4Lite(addrWidth, dataWidth))
   })
 
@@ -74,17 +75,19 @@ class AXI4LiteCSRDecoder(addrWidth: Int, dataWidth: Int)
   io.controlOut.ar.arprot := 0.U(AXI4Lite.protWidth.W)
   io.controlOut.r.rready := false.B
 
-  io.controlAcc.aw.awvalid := false.B
-  io.controlAcc.aw.awaddr := 0.U(addrWidth.W)
-  io.controlAcc.aw.awprot := 0.U(AXI4Lite.protWidth.W)
-  io.controlAcc.w.wvalid := false.B
-  io.controlAcc.w.wdata := 0.U(dataWidth.W)
-  io.controlAcc.w.wstrb := 0.U((dataWidth / 8).W)
-  io.controlAcc.b.bready := false.B
-  io.controlAcc.ar.arvalid := false.B
-  io.controlAcc.ar.araddr := 0.U(addrWidth.W)
-  io.controlAcc.ar.arprot := 0.U(AXI4Lite.protWidth.W)
-  io.controlAcc.r.rready := false.B
+  if (accHasCSR) {
+    io.controlAcc.get.aw.awvalid := false.B
+    io.controlAcc.get.aw.awaddr := 0.U(addrWidth.W)
+    io.controlAcc.get.aw.awprot := 0.U(AXI4Lite.protWidth.W)
+    io.controlAcc.get.w.wvalid := false.B
+    io.controlAcc.get.w.wdata := 0.U(dataWidth.W)
+    io.controlAcc.get.w.wstrb := 0.U((dataWidth / 8).W)
+    io.controlAcc.get.b.bready := false.B
+    io.controlAcc.get.ar.arvalid := false.B
+    io.controlAcc.get.ar.araddr := 0.U(addrWidth.W)
+    io.controlAcc.get.ar.arprot := 0.U(AXI4Lite.protWidth.W)
+    io.controlAcc.get.r.rready := false.B
+  }
 
   val awaddr = RegInit(0.U(addrWidth.W))
   val araddr = RegInit(0.U(addrWidth.W))
@@ -103,8 +106,8 @@ class AXI4LiteCSRDecoder(addrWidth: Int, dataWidth: Int)
   val busReadMux = MuxCase(
     sNone,
     Array(
-      isCsr(araddr, baseCsrAddrOut, customCSRSize.U) -> sOut,
-      isCsr(araddr, baseCsrAddrIn, customCSRSize.U) -> sIn,
+      isCsr(araddr, baseCsrAddrOut, dmaCSRSize.U) -> sOut,
+      isCsr(araddr, baseCsrAddrIn, dmaCSRSize.U) -> sIn,
       isCsr(araddr, baseCsrAddrAcc, customCSRSize.U) -> sAcc
     )
   )
@@ -112,8 +115,8 @@ class AXI4LiteCSRDecoder(addrWidth: Int, dataWidth: Int)
   val busWriteMux = MuxCase(
     sNone,
     Array(
-      isCsr(awaddr, baseCsrAddrOut, customCSRSize.U) -> sOut,
-      isCsr(awaddr, baseCsrAddrIn, customCSRSize.U) -> sIn,
+      isCsr(awaddr, baseCsrAddrOut, dmaCSRSize.U) -> sOut,
+      isCsr(awaddr, baseCsrAddrIn, dmaCSRSize.U) -> sIn,
       isCsr(awaddr, baseCsrAddrAcc, customCSRSize.U) -> sAcc
     )
   )
@@ -146,11 +149,13 @@ class AXI4LiteCSRDecoder(addrWidth: Int, dataWidth: Int)
           busRead := busReadMux
         }
         is(sAcc) {
-          connectRead(io.control, io.controlAcc)
-          when(isReadOver(io.control)) {
-            readState := sIdleRead
+          if (accHasCSR) {
+            connectRead(io.control, io.controlAcc.get)
+            when(isReadOver(io.control)) {
+              readState := sIdleRead
+            }
+            busRead := busReadMux
           }
-          busRead := busReadMux
         }
       }
     }
@@ -181,11 +186,13 @@ class AXI4LiteCSRDecoder(addrWidth: Int, dataWidth: Int)
           busWrite := busWriteMux
         }
         is(sAcc) {
-          connectWrite(io.control, io.controlAcc)
-          when(isWriteOver(io.control)) {
-            writeState := sIdleWrite
+          if (accHasCSR) {
+            connectWrite(io.control, io.controlAcc.get)
+            when(isWriteOver(io.control)) {
+              writeState := sIdleWrite
+            }
+            busWrite := busWriteMux
           }
-          busWrite := busWriteMux
         }
       }
     }

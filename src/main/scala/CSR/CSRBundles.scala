@@ -12,7 +12,7 @@ class CSRAccessBundle(val controlDataWidth: Int) extends Bundle{
 
 class CSRBusBundle(val controlDataWidth: Int, val controlRegisterCnt: Int) extends Bundle{
     val ready = Input(Bool())
-    val addr = Output(UInt(log2Ceil(controlRegisterCnt).W))
+    val addr = Output(UInt((if (controlRegisterCnt > 0) log2Ceil(controlRegisterCnt) else 1).W))
     val reg = new CSRAccessBundle(controlDataWidth)
 
     def read: Bool = ready && reg.read

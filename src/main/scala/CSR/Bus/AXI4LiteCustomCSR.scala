@@ -8,7 +8,7 @@ import DMAController.DMAConfig._
 class AXI4LiteCustomCSR(dataWidth: Int, csrCount: Int)
     extends AIGCSRBus[AXI4Lite] {
   val addrOff = log2Ceil(dataWidth / 8)
-  val addrWidth = log2Ceil(csrCount) + addrOff
+  val addrWidth = (if (csrCount > 0) log2Ceil(csrCount) else 1) + addrOff
 
   val io = IO(new Bundle {
     val ctl = Flipped(new AXI4Lite(addrWidth, dataWidth))

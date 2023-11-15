@@ -9,7 +9,7 @@ abstract class AIGDecoder[+T] extends Module {
   val io: Bundle {
     val controlIn: T
     val controlOut: T
-    val controlAcc: T
+    val controlAcc: Option[T]
     val control: T
   }
 }

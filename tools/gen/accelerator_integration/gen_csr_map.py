@@ -44,12 +44,18 @@ def gen_csr_map(config_path: str, csr_map_path: str) -> None:
     with open(config_path, 'r') as conf, open(csr_map_path, 'w') as fout:
         config = json.load(conf)
 
-        csrs = config["accelerator"]["csr"]
         reg_width = get_reg_width(config)
 
         out = def_package("AIG.CSR.CustomCSRDefinition")
-        out += def_imports(["chisel3._",
-                           "AIG.CSR.{BaseRegister, StorageRegister}"])
+        out += def_imports(["chisel3._", "AIG.CSR.{BaseRegister, StorageRegister}"])
+
+        if 'csr' not in config['accelerator']:
+            reg_map = def_value("regMap", f"Map[String, BaseRegister]()", isize=2)
+            csr_map_obj = def_object("CSRMap", content=reg_map)
+            fout.write(out + csr_map_obj)
+            return
+
+        csrs = config["accelerator"]["csr"]
 
         map_entries = [create_map_entry(
             csr["address"], csr["name"], _reg_type_dict[csr["type"]], reg_width) for csr in csrs]

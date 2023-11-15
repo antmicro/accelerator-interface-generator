@@ -88,7 +88,11 @@ object AIGConfigUtils {
   val baseDMAInAddr = s"h$baseDMAInAddrStr".U(32.W)
   val baseDMAOutAddr = s"h$baseDMAOutAddrStr".U(32.W)
   val dataWidth = dmaIn.controlDataWidth
-  val customCSRSize = (fileContent \ "accelerator" \ "csr").get
-    .as[List[JsValue]]
+  val customCSRSize = (fileContent \ "accelerator" \ "csr")
+    .asOpt[List[JsValue]]
+    .getOrElse(List())
     .length * dataWidth
+  val accHasCSR = customCSRSize > 0
+  val dmaCSRSize =
+    dmaRegCount * 32 // FastVDMA does not yet allow for customizable control data width
 }
