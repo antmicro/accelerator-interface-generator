@@ -39,25 +39,29 @@
                         "name": "bgr",
                         "type": "Bool",
                         "direction": "Input",
-                        "size": 1
+                        "size": 1,
+                        "offset": 6
                     },
                     {
                         "name": "pattern",
                         "type": "UInt",
                         "direction": "Input",
-                        "size": 2
+                        "size": 2,
+                        "offset": 4
                     },
                     {
                         "name": "busy",
                         "type": "Bool",
                         "direction": "Output",
-                        "size": 1
+                        "size": 1,
+                        "offset": 3
                     },
                     {
                         "name": "algorithm",
                         "type": "UInt",
                         "direction": "Input",
-                        "size": 3
+                        "size": 3,
+                        "offset": 0
                     }
                 ]
             },
@@ -70,13 +74,15 @@
                         "name": "rows",
                         "type": "UInt",
                         "direction": "Input",
-                        "size": 13
+                        "size": 13,
+                        "offset": 13
                     },
                     {
                         "name": "cols",
                         "type": "UInt",
                         "direction": "Input",
-                        "size": 13
+                        "size": 13,
+                        "offset": 0
                     }
                 ]
             }

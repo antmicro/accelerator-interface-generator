@@ -53,7 +53,7 @@ def gen_reg_def(config_path: str, reg_def_path: str) -> None:
         csr_bundle_entries = []
         for csr in ordered_csrs:
             csr_name = csr["name"]
-            fields = def_csr_entries(csr["fields"])
+            fields = def_csr_entries(sorted(csr["fields"], key=lambda x: x['offset'], reverse=True))
             out += def_class(csr_name, [], "RegisterBase", fields) + "\n"
             csr_bundle_entries.append(
                 def_value(f"{csr_name.lower()}: {csr_name}", f"new {csr_name}"))

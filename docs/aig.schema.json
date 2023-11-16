@@ -193,6 +193,11 @@
                                             "description": "Field size. Total size of fields within a CSR cannot exceed Accelerator's controlDataWidth.",
                                             "type": "number",
                                             "minimum": 1
+                                        },
+                                        "offset": {
+                                            "description": "Field within the CSR. CSR field needs to fit within 0 and Accelerator's controlDataWidth.",
+                                            "type": "number",
+                                            "minimum": 0
                                         }
                                     },
                                     "required": [
