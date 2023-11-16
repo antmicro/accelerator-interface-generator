@@ -1,5 +1,7 @@
 import datetime
+from dataclasses import dataclass
 from enum import Enum, StrEnum, auto
+from math import ceil, pow, log2
 import json
 import os
 import re
@@ -14,6 +16,7 @@ _acronym_to_soc_bus = {
 
 _soc_bus_to_acronym = dict((v, k) for k, v in _acronym_to_soc_bus.items())
 
+ROOT_DIR = os.path.dirname(__file__).removesuffix('/tools/gen/target')
 
 class Signals:
     class AxiSignals(StrEnum):
@@ -270,12 +273,87 @@ class SoCBridge(StrEnum):
     axil2axi = 'axi.AXILite2AXI'
 
 
-class Config:
-    def __init__(self, config_path):
-        with open(config_path, 'r') as conf:
-            config = json.load(conf)
-            params = "params"
+@dataclass(frozen=True)
+class MemoryRegion:
+    name: str
+    origin: int
+    size: int
 
+@dataclass(frozen=True)
+class MemoryMapEntry:
+    name: str
+    origin: int
+
+class Config:
+    def __init__(self, target_config_path: str):
+        from jsonschema import validate
+        from validate_config import validate_config
+
+        target_schema_path = os.path.join(ROOT_DIR, "docs", "target.schema.json")
+        with open(target_config_path, 'r') as target_config, open(target_schema_path) as target_schema:
+            config = json.load(target_config)
+            schema = json.load(target_schema)
+
+            # Validate target config
+            try:
+                validate(config, schema)
+            except Exception as err:
+                raise Exception(f'Invalid target config: {type(err)}: {err}')
+
+            self.target = config['targetDevice']
+            self.cpu = config['cpu']
+            self.freq = config['systemClockFrequency']
+            self.base_addr = int(config['baseAddress'], 16)
+
+            if 'additionalMemoryRegions' in config:
+                self.mem_regions = []
+                for reg in config['additionalMemoryRegions']:
+                    self.mem_regions.append(MemoryRegion(reg['name'], reg['origin'], reg['size']))
+
+            if 'customMemoryMapEntries' in config:
+                self.mem_map_entries = []
+                for entry in config['customMemoryMapEntries']:
+                    self.mem_map_entries.append(MemoryMapEntry(entry['name'], entry['origin']))
+
+            self.soc_args = {'cpu_type': self.cpu}
+            if 'socArgs' in config:
+                for arg in config['socArgs']:
+                    val = arg['value']
+                    # Deduce value type
+                    if type(val) is int: # Decimal number
+                        pass
+                    elif val.startswith('0x') and val[2:].isnumeric(): # Hexadecimal number
+                        val = int(val, 16)
+                    elif val.lower() == "true": # Boolean
+                        val = True
+                    elif val.lower() == "false": # Boolean
+                        val = False
+
+                    self.soc_args[arg['name']] = val
+
+            if 'addArgGroupsCustom' in config:
+                self.custom_arg_groups = []
+                for func in config['addArgGroupsCustom']:
+                    self.custom_arg_groups.append(func)
+
+            if 'setCpuArgsCustom' in config:
+                self.set_cpu_args_custom = []
+                for func in config['setCpuArgsCustom']:
+                    self.set_cpu_args_custom.append(func)
+
+            self.aig_size = None if 'aigSize' not in config else config['aigSize']
+            aig_config_path = config['aigConfigPath']
+
+        # Validate AIG config
+        try:
+            validate_config(aig_config_path)
+        except Exception as err:
+            raise Exception(f'Invalid AIG config: {type(err)}: {err}')
+
+        with open(aig_config_path, 'r') as aig_config:
+            config = json.load(aig_config)
+
+            params = "params"
             for comp in ["dmaIn", "dmaOut", "accelerator"]:
                 for width in ["dataWidth", "addrWidth", "controlDataWidth", "controlAddrWidth"]:
                     if params in config[comp]:
@@ -316,10 +394,12 @@ class Config:
             self.source_file = acc_config["sourceFile"]
             self.signal_mapping = acc_config["signals"]
 
-            self.base_addr = min(self.dmain_baseaddr,
-                                 self.dmaout_baseaddr,
-                                 self.accelerator_baseaddr)
-
+            if not self.aig_size:
+                dma_reg_cnt = 16
+                dma_csr_size = dma_reg_cnt * (self.dmaout_controldatawidth / 8)
+                acc_csr_size = 0 if 'csr' not in config['accelerator'] else len(config['accelerator']['csr'])
+                aligned_csr_size = int(pow(2, ceil(log2(max(dma_csr_size, acc_csr_size)))))
+                self.aig_size = aligned_csr_size
 
 class AIGTarget:
     BR = "\n\n"
@@ -395,11 +475,13 @@ class AIGTarget:
         imports = {
             "os": [],
             "migen": ["*"],
-            "litex_boards.targets": [self.target],
+            "litex_boards.targets": [f"{self.target} as target"],
             "litex.soc.interconnect": ["axi", "wishbone"],
             "litex.soc.integration.soc": ["SoCRegion"],
-            "litex.soc.integration.builder": ["Builder"],
-            "litex.build.parser": ["LiteXArgumentParser"]
+            "litex.soc.integration.builder": ["Builder", "builder_args"],
+            "litex.build.parser": ["LiteXArgumentParser"],
+            "litex.soc.integration.soc_core": ["soc_core_args"],
+            "litex.soc.cores.cpu.vexriscv_smp": ["VexRiscvSMP"]
         }
         return self._join([self._import(f, i) for f, i in imports.items()])
 
@@ -417,7 +499,7 @@ class AIGTarget:
                                bus.soc_type + f'({bus.datawidth}, {bus.addrwidth})')
                      for bus in [self.bus_in, self.bus_csr, self.bus_out]]
 
-        # Size of the FastVDMA irqs if fixed
+        # Size of the FastVDMA irqs is fixed
         irq_in = self._var('self.irq_dmaIn', 'Signal(2)')
         irq_out = self._var('self.irq_dmaOut', 'Signal(2)')
 
@@ -463,7 +545,7 @@ class AIGTarget:
         return self._var('self.submodules', bridge, '+=')
 
     def _aigsoc(self, isz: int = 0, ich: str = ' '):
-        init_soc_core = [f"{self.target}.BaseSoC.__init__(self, **kwargs)", '']
+        init_soc_core = [f"target.BaseSoC.__init__(self, **kwargs)", '']
         init_aig = self._var('self.submodules.AIG', 'AIG(self.platform)')
 
         # Connect IOs
@@ -481,60 +563,64 @@ class AIGTarget:
             ios.append(self._connect_memory_bus(bus))
             ios.append('')
 
-        csr = []
         self.bus_csr.soc_name = f'self.AIG.{self.bus_csr.soc_name}'
 
-        if self.cpu == 'zynq7000':
-            csr.append(f'self.mem_map["csr"]={hex(self.config.base_addr + self.aig_size)}')
+        custom_mem_map_entries = []
+        if hasattr(self.config, 'mem_map_entries'):
+            for entry in self.config.mem_map_entries:
+                custom_mem_map_entries.append(f'self.mem_map["{entry.name}"]={entry.origin}')
+
+        custom_mem_regions = []
+        if hasattr(self.config, 'mem_regions'):
+            for reg in self.config.mem_regions:
+                custom_mem_regions.append(self._var(f'self.bus.regions["{reg.name}"]',
+                                             f'SoCRegion(origin={reg.origin}, size={reg.size})'))
 
         add_aig = f'self.bus.add_slave("AIG", {self.bus_csr.soc_name}, SoCRegion(origin={hex(self.config.base_addr)}, size={hex(self.aig_size)}, cached=False))'
 
-        if self.cpu == "zynq7000":
-            add_irq = self._add_interrupts(
-                {0: 'self.AIG.irq_dmaIn[1]', 2: 'self.AIG.irq_dmaOut[0]'})
-        else:
-            add_irq = self._add_interrupts(
-                {14: 'self.AIG.irq_dmaIn[1]', 15: 'self.AIG.irq_dmaOut[0]'})
+        add_irq = self._add_interrupts({0: 'self.AIG.irq_dmaIn[1]', 1: 'self.AIG.irq_dmaOut[0]'})
 
         init_content = self.indt(isz+8, ich) + f"\n{self.indt(isz+8, ich)}".join(
-            [*init_soc_core, init_aig, *ios, *csr, add_aig, *add_irq])
+            [*init_soc_core, init_aig, *ios, *custom_mem_map_entries, *custom_mem_regions, add_aig, *add_irq])
 
         init_params = ["self", "**kwargs"]
 
         init = self._func("__init__", init_params, init_content, isz=isz+4, ich=ich)
 
-        return self._class("AIGSoC", init, f"{self.target}.BaseSoC")
+        return self._class("AIGSoC", init, f"target.BaseSoC")
 
     def _main(self):
         # Import platform
         parser = []
         desc = f"AIG SoC on {self.target}"
-        if self.target == 'digilent_arty':
-            imp = self._import("litex_boards.platforms", [self.platform])
-            parser = [imp, self._var("parser",
-                                     f'LiteXArgumentParser(platform={self.platform}.Platform,'
-                                     f'description="{desc}")')]
+        parser = [self._var("parser", f'LiteXArgumentParser(description="{desc}")'),
+                  'builder_args(parser)',
+                  'soc_core_args(parser)']
 
-        elif self.target == 'antmicro_zynq_video_board':
-            parser = [self._var("parser", f'LiteXArgumentParser(description="{desc}")')]
+        if hasattr(self.config, 'custom_arg_groups'):
+            for func in self.config.custom_arg_groups:
+                parser.append(f'{func}(parser)')
 
-        add_build_arg = 'parser.add_argument("--build", action="store_true", help="Build bitstream")'
-        args = self._var("args", "parser.parse_args()")
+        args = self._var('custom_soc_args', '{}')
+        if hasattr(self.config, 'soc_args'):
+            args = self._var('custom_soc_args', self.config.soc_args)
 
-        soc = []
+        update_args = [self._var('soc_args', 'parser.soc_argdict'),
+                       'soc_args.update(custom_soc_args)',
+                       'parser.set_defaults(**soc_args)'
+                       ]
+        if hasattr(self.config, 'set_cpu_args_custom'):
+            update_args.append(self._var('args', 'parser.parse_args()'))
+            for func in self.config.set_cpu_args_custom:
+                update_args.append(f'{func}(args)')
 
-        if self.target == 'digilent_arty':
-            soc = [self._var("soc", f"AIGSoC(**parser.soc_argdict)")]
-        elif self.target == 'antmicro_zynq_video_board':
-            soc = [self._var('soc_args', 'parser.soc_argdict'),
-                   self._var('soc_args["cpu_type"]', '"zynq7000"'),
-                   self._var("soc", f"AIGSoC(**soc_args)")]
+        init_soc = [self._var("soc", f"AIGSoC(**soc_args)")]
 
         output_path = 'os.path.join("build", "aig_generated_target")'
         builder = self._var("builder", f"Builder(soc, output_dir={output_path})")
 
-        content = [*parser, add_build_arg, args, *soc, builder,
-                   self._if('args.build', f'{self.indt(4)}builder.build(**parser.toolchain_argdict)')]
+        content = [*parser, args, *update_args, *init_soc, builder,
+                   f'{self.indt(4)}builder.build(**parser.toolchain_argdict)']
 
         main_content = f"\n{self.indt(4)}".join(content)
 
@@ -558,7 +644,6 @@ class AIGTarget:
             raise ValueError(f'Unknown signal {aig_signal}')
 
         # parse signal names from verilog
-        ROOT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../../')
         aig = Signals().get_aigtop_signals(ROOT_DIR)
 
         assignents = []

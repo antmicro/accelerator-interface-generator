@@ -15,10 +15,8 @@ export TAG
 
 # Integration generation parameters ###########################################
 
-CONFIG_FILE ?= "config.json"
-CONFIG_ARG = $(if $(CONFIG_FILE),--config-path $(CONFIG_FILE),)
-FREQ_ARG = $(if $(FREQ), --freq $(FREQ),)
-AIG_SIZE_ARG = $(if $(AIG_SIZE), --aig-size $(AIG_SIZE),)
+AIG_CONFIG ?= "config.json"
+AIG_CONFIG_ARG = $(if $(AIG_CONFIG),--config-path $(AIG_CONFIG),)
 
 ###############################################################################
 
@@ -46,7 +44,7 @@ verilog: setup
 	$(SBT) "runMain $(MAIN)"
 
 setup:
-	python3 tools/gen/accelerator_integration/aig_gen.py $(CONFIG_ARG)
+	python3 tools/gen/accelerator_integration/aig_gen.py $(AIG_CONFIG_ARG)
 
 test: setup
 	$(SBT) test
@@ -56,7 +54,7 @@ cocotb_test: verilog
 	pytest cocotb-tests
 
 target: verilog
-	python3 tools/gen/target/target_gen.py --config $(CONFIG_FILE) --target $(TARGET)$(AIG_SIZE_ARG)$(FREQ_ARG)
+	python3 tools/gen/target/target_gen.py --config $(TARGET_CONFIG)
 
 clean:
 	$(SBT) clean

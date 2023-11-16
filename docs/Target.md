@@ -5,16 +5,12 @@
 In order to generate a target containing AIG design run:
 
 ```bash
-make target CONFIG_FILE=<path_to_config> TARGET=<target_device> AIG_SIZE=<core_size> FREQ=<clock_frequency>
+make target AIG_CONFIG=<path_to_aig_config> TARGET_CONFIG=<path_to_target_config>
 ```
 
-Where the `TARGET` is the name of the target device. Currently supported targets are:
-- `digilent_arty` (with `VexRiscV SMP`),
-- `antmicro_zynq_video_board` (with `Zynq7000`).
+Where the `AIG_CONFIG` is the path to the configuration for the AIG and the `TARGET_CONFIG` is the path to the target FPGA device configuration.
 
-Optionally, `AIG_SIZE` and `FREQ` parameters may be passed to specify the size of the memory region to be designated for the AIG core and the clock frequency respectively.
-
-The generated target will be saved in `aig_generated_target.py` file. 
+The generated target will be saved in `aig_generated_target.py` file.
 
 To synthesize, place, route & generate bitstream, run:
 

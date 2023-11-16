@@ -217,7 +217,7 @@ async def run_test(dut):
     width = 600
     height = 398
     CLK_PERIOD = 2
-    CONFIG_PATH = os.path.join(ROOT_DIR, os.getenv("CONFIG_FILE"))
+    CONFIG_PATH = os.path.join(ROOT_DIR, os.getenv("AIG_CONFIG"))
     with open(CONFIG_PATH, 'r') as conf:
         config = json.load(conf)
         cfg = config['busConfiguration'].split("_")

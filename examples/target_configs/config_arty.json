@@ -1,0 +1,43 @@
+{
+    "targetDevice": "digilent_arty",
+    "cpu": "vexriscv_smp",
+    "systemClockFrequency": 100e6,
+    "baseAddress": "0xa0000000",
+    "aigConfigPath": "examples/configs/config_arty.json",
+    "addArgGroupsCustom": [
+        "VexRiscvSMP.args_fill"
+    ],
+    "setCpuArgsCustom": [
+        "VexRiscvSMP.args_read"
+    ],
+    "socArgs": [
+        {
+            "name": "with_coherent_dma",
+            "value": "True"
+        },
+        {
+            "name": "with_uart",
+            "value": "True"
+        },
+        {
+            "name": "uart_name",
+            "value": "serial"
+        },
+        {
+            "name": "integrated_rom_size",
+            "value": "0x10000"
+        },
+        {
+            "name": "integrated_sram_size",
+            "value": "0x1800"
+        },
+        {
+            "name": "with_timer",
+            "value": "True"
+        },
+        {
+            "name": "bios_console",
+            "value": "full"
+        }
+    ]
+}

@@ -20,7 +20,7 @@ case class CustomCSR(
 )
 
 object AIGConfigUtils {
-  private val configFileName = System.getenv("CONFIG_FILE")
+  private val configFileName = System.getenv("AIG_CONFIG")
   if (!new File(configFileName).exists()) {
     throw new Exception("Missing configuration file")
   }

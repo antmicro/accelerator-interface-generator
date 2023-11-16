@@ -1,0 +1,13 @@
+{
+    "targetDevice": "antmicro_zynq_video_board",
+    "cpu": "zynq7000",
+    "systemClockFrequency": 100e6,
+    "baseAddress": "0x43c00000",
+    "customMemoryMapEntries": [
+        {
+            "name": "csr",
+            "origin": "0xf0000000"
+        }
+    ],
+    "aigConfigPath": "examples/configs/config_zvb.json"
+}

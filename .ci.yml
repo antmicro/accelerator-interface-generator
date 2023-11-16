@@ -23,7 +23,7 @@ test-basic:
   <<: *setup_env
   stage: test
   script:
-    - make test CONFIG_FILE=examples/configs/config_zvb.json
+    - make test AIG_CONFIG=examples/configs/config_zvb.json
     - mv out.png out.rgba out/
   artifacts:
     paths:
@@ -33,7 +33,7 @@ test-cocotb:
   <<: *setup_env
   stage: test
   script:
-    - make cocotb_test CONFIG_FILE=examples/configs/config_zvb.json
+    - make cocotb_test AIG_CONFIG=examples/configs/config_zvb.json
     - mv sim_build/AIGTop.fst out/
   artifacts:
     paths:

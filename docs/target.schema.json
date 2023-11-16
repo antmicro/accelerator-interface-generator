@@ -1,0 +1,131 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "TargetFPGADevice",
+    "description": "Configuration file for the Target FPGA Device for AIG.",
+    "type": "object",
+    "required": [
+        "targetDevice",
+        "cpu",
+        "systemClockFrequency",
+        "baseAddress",
+        "aigConfigPath"
+    ],
+    "properties": {
+        "targetDevice": {
+            "description": "Target FPGA device.",
+            "type": "string",
+            "pattern": "^(antmicro_zynq_video_board|digilent_arty)$"
+        },
+        "cpu": {
+            "description": "CPU to be utilized for the Target FPGA Device.",
+            "type": "string",
+            "pattern": "^(zynq7000|vexriscv_smp)$"
+        },
+        "systemClockFrequency": {
+            "description": "Target's system clock frequency.",
+            "type": "number"
+        },
+        "baseAddress": {
+            "description": "Base address of the AIG SoC region. Expressed in hex.",
+            "type": "string"
+        },
+        "additionalMemoryRegions": {
+            "description": "Memory regions to be additionaly created at target device. Expressed by [{name}, {origin}, {size}].",
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/memoryRegion"
+            }
+        },
+        "customMemoryMapEntries": {
+            "description": "Custom target's memory map modifications.",
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/memoryMapEntry"
+            }
+        },
+        "socArgs": {
+            "description": "Target's additinal arguments.",
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/socArg"
+            }
+        },
+        "addArgGroupsCustom": {
+            "description": "Function to be called on parser to append a custom argument group.",
+            "type": "array",
+            "items": {
+                "type":"string"
+            }
+        },
+        "setCpuArgsCustom": {
+            "description": "Function to be called on argparse.Namespace object to set the CPU arguments.",
+            "type": "array",
+            "items": {
+                "type":"string"
+            }
+        },
+        "aigSize": {
+            "description": "Size for the AIG memory region. If not specified will be calculated based on defined custom CSRs.",
+            "type": "string"
+        },
+        "aigConfigPath": {
+            "description": "Path to AIG configuration.",
+            "type": "string"
+        }
+    },
+    "$defs": {
+        "memoryRegion": {
+            "type": "object",
+            "required": [
+                "name",
+                "origin",
+                "size"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Name of the memory region"
+                },
+                "origin": {
+                    "type": "string",
+                    "description": "Start addresss of the memory region in hex."
+                },
+                "size": {
+                    "type": "string",
+                    "description": "Size of the memory region in bytes expressed by a hexadecimal number."
+                }
+            }
+        },
+        "memoryMapEntry": {
+            "type": "object",
+            "required": [
+                "name",
+                "origin"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Name of the memory region"
+                },
+                "origin": {
+                    "type": "string",
+                    "description": "Start addresss of the memory region in hex."
+                }
+            }
+        },
+        "socArg": {
+            "type": "object",
+            "required": [
+                "name",
+                "value"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Name of the SoC argument."
+                },
+                "value": {}
+            }
+        }
+    }
+}

@@ -16,7 +16,8 @@ class AIGTargetOnArty(AIGTarget):
     def _add_interrupts(self, interupts: dict):
         irqs = []
         for no, irq in interupts.items():
-            irqs.append(f'self.cpu.interrupt[{no}].eq({irq})')
+            # User interrupts begin at no 14
+            irqs.append(f'self.cpu.interrupt[{no+14}].eq({irq})')
 
         return [self._comb('[' + ',\n'.join(irqs) + ']')]
 
@@ -45,39 +46,27 @@ class AIGTargetOnZVB(AIGTarget):
     def _connect_memory_bus(self, memoryBus: Bus):
         return self._comb(f"{memoryBus.soc_name}.connect(self.cpu.add_axi_hp_slave())")
 
+def get_target_instance_from_string(target: str):
+    supported_targets = {
+        'digilent_arty': AIGTargetOnArty,
+        'antmicro_zynq_video_board': AIGTargetOnZVB
+    }
+    return supported_targets[target]
 
 if __name__ == "__main__":
     ROOT_DIR = os.path.dirname(__file__).removesuffix('/tools/gen/target')
-    DEF_CONFIG_PATH = os.path.join(ROOT_DIR, 'config.json')
     DEF_TARGET_PATH = os.path.join(ROOT_DIR, 'aig_generated_target.py')
 
     parser = argparse.ArgumentParser(description="AIG soc Target Generator.")
-    parser.add_argument("--freq", default=100e6,
-                        type=int, help="Target clock frequency.")
-    parser.add_argument("--aig-size", default=0x10_0000,
-                        type=int, help="Total size of AIG interface.")
-    parser.add_argument("--target", default="digilent_arty",
-                        type=str, help="Target FPGA device.")
-    parser.add_argument("--config", default=DEF_CONFIG_PATH,
-                        type=str, help="Path to AIG configuration.")
-    parser.add_argument("--out", default=DEF_TARGET_PATH,
-                        type=str, help="Output path.")
+    parser.add_argument("--config", type=str, help="Path to target configuration.")
+    parser.add_argument("--out", default=DEF_TARGET_PATH, type=str, help="Path for output target definition.")
+    # Provides access to AIG validating procedures
+    sys.path.append(os.path.join(ROOT_DIR, 'tools/gen/accelerator_integration')) 
 
     args = parser.parse_args()
-    assert (args.target in ['antmicro_zynq_video_board', 'digilent_arty'])
-
-    sys.path.append(os.path.join(ROOT_DIR, 'tools/gen/accelerator_integration'))
-
-    desc = os.open(path=args.out, flags=(os.O_WRONLY | os.O_CREAT | os.O_TRUNC), mode=0o777)
     cfg = Config(args.config)
-
-    if args.target == 'digilent_arty':
-        target = AIGTargetOnArty(args.freq, args.aig_size, cfg)
-    elif args.target == 'antmicro_zynq_video_board':
-        target = AIGTargetOnZVB(args.freq, args.aig_size, cfg)
-
+    target = get_target_instance_from_string(cfg.target)(cfg.freq, cfg.aig_size, cfg)
     target.to_file(args.out)
 
-    # Agressive formating (lines are a bit too long)
     import subprocess
     subprocess.run(['autopep8', '--in-place', args.out])
