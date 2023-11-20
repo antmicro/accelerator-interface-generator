@@ -6,6 +6,7 @@ import java.io.File
 import chisel3._
 import AIG.CSR.{BaseRegister, StorageRegister, ClearRegister, StatusRegister}
 import AIG.CSR.CustomCSRDefinition._
+import math.{pow, log, max, ceil}
 
 case class CSRField(
     name: String,
@@ -78,21 +79,21 @@ object AIGConfigUtils {
   val dmaIn = getDMAConfig("dmaIn", dmaInConfigString)
   val dmaOut = getDMAConfig("dmaOut", dmaOutConfigString)
   assert(dmaIn.controlDataWidth == dmaOut.controlDataWidth)
-  private val baseAccAddrStr =
-    (fileContent \ "accelerator" \ "baseAddress").get.as[String].substring(2)
-  private val baseDMAInAddrStr =
-    (fileContent \ "dmaIn" \ "baseAddress").get.as[String].substring(2)
-  private val baseDMAOutAddrStr =
-    (fileContent \ "dmaOut" \ "baseAddress").get.as[String].substring(2)
-  val baseAccAddr = s"h$baseAccAddrStr".U(32.W)
-  val baseDMAInAddr = s"h$baseDMAInAddrStr".U(32.W)
-  val baseDMAOutAddr = s"h$baseDMAOutAddrStr".U(32.W)
   val dataWidth = dmaIn.controlDataWidth
   val customCSRSize = (fileContent \ "accelerator" \ "csr")
     .asOpt[List[JsValue]]
     .getOrElse(List())
-    .length * dataWidth
+    .length * (dataWidth / 8)
   val accHasCSR = customCSRSize > 0
   val dmaCSRSize =
-    dmaRegCount * 32 // FastVDMA does not yet allow for customizable control data width
+    dmaRegCount * (dataWidth / 8) // FastVDMA does not yet allow for customizable control data width
+  val csrSizeAligned = pow(2, ceil(log(List(dmaCSRSize, customCSRSize).max)/log(2))).toInt
+  val baseDMAInAddr = 0
+  val baseAccAddr = baseDMAInAddr + csrSizeAligned
+  val baseDMAOutAddr = baseAccAddr + csrSizeAligned
+  private val aigSize = baseDMAOutAddr + csrSizeAligned - baseDMAInAddr
+  val aigMaxAddrLen = aigSize.toBinaryString.length()
+  println(f"DMA IN offset: 0x$baseDMAInAddr%X")
+  println(f"Accelerator offset: 0x$baseAccAddr%X")
+  println(f"DMA out offset: 0x$baseDMAOutAddr%X")
 }

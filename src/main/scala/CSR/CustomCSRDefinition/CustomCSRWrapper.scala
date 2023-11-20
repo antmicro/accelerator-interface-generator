@@ -12,7 +12,7 @@ class CustomCSRWrapper(val controlDataWidth: Int, controlRegisterCnt: Int)
     val bus = Flipped(new CSRBusBundle(controlDataWidth, controlRegisterCnt))
   })
 
-  val baseAddr = (AIGConfigUtils.baseAccAddr / (AIGConfigUtils.dataWidth / 8).U(32.W))
+  val baseAddr = (AIGConfigUtils.baseAccAddr.U / (AIGConfigUtils.dataWidth / 8).U(32.W))
 
   io.bus.ready := io.bus.reg.write || io.bus.reg.read
   io.bus.reg.dataIn := 0xbeef.U
@@ -31,7 +31,7 @@ class CustomCSRWrapper(val controlDataWidth: Int, controlRegisterCnt: Int)
   }
 
   for ((addr, reg) <- regMap) {
-    when((io.bus.addr + baseAddr) === (addr.U / (controlDataWidth / 8).U)) {
+    when((io.bus.addr === (addr.U / (controlDataWidth / 8).U))) {
       reg.io <> io.bus.reg
     }.otherwise {
       reg.io.write := false.B

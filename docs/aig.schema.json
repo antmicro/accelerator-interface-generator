@@ -11,31 +11,17 @@
         },
         "dmaIn": {
             "description": "Input FastVDMA specification. This DMA controls the data flow from main memory to Accelerator.",
-            "baseAddress": {
-                "description": "The physical absolute address at which DMA will be placed.",
-                "type": "string"
-            },
             "params": {
                 "description": "Input DMA parameters specification",
                 "$ref": "./dma.schema.json"
-            },
-            "required": [
-                "baseAddress"
-            ]
+            }
         },
         "dmaOut": {
             "description": "Output FastVDMA specification. This DMA controls the data flow from Accelerator to main memory.",
-            "baseAddress": {
-                "description": "The physical absolute address at which DMA will be placed.",
-                "type": "string"
-            },
             "params": {
                 "description": "Input DMA parameters specification",
                 "$ref": "./dma.schema.json"
-            },
-            "required": [
-                "baseAddress"
-            ]
+            }
         },
         "accelerator": {
             "description": "Accelerator specification",
@@ -47,10 +33,6 @@
                 },
                 "topName": {
                     "description": "Name of the top module in verilog source file.",
-                    "type": "string"
-                },
-                "baseAddress": {
-                    "description": "The physical absolute address at which Accelerator will be placed. Expressed as a hexadecimal value.",
                     "type": "string"
                 },
                 "params": {
@@ -231,7 +213,6 @@
                 }
             },
             "required": [
-                "baseAddress",
                 "topName",
                 "sourceFile",
                 "signals",

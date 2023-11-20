@@ -64,10 +64,6 @@
                 "type":"string"
             }
         },
-        "aigSize": {
-            "description": "Size for the AIG memory region. If not specified will be calculated based on defined custom CSRs.",
-            "type": "string"
-        },
         "aigConfigPath": {
             "description": "Path to AIG configuration.",
             "type": "string"

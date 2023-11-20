@@ -70,15 +70,15 @@ class DecoderTest(
 class DecoderSpec extends AnyFlatSpec with ChiselScalatestTester {
   behavior of "DecoderSpec"
   val addrWidth = 32
-  val dmaInAddr = baseDMAInAddr.litValue
-  val dmaOutAddr = baseDMAOutAddr.litValue
-  val accAddr = baseAccAddr.litValue
+  val dmaInAddr = baseDMAInAddr
+  val dmaOutAddr = baseDMAOutAddr
+  val accAddr = baseAccAddr
 
   val componentNames =
     List("DMAIn CSR Bus", "DMAOut CSR Bus", "Accelerator CSR Bus")
   val baseAddresses = List(dmaInAddr, dmaOutAddr, accAddr)
   val addrRanges =
-    baseAddresses.map(addr => (addr until addr + customCSRSize by addrWidth / 4))
+    baseAddresses.map(addr => (addr until addr + customCSRSize by (addrWidth / 8)))
 
   for ((name, range) <- (componentNames zip addrRanges))
     for (addr <- range)

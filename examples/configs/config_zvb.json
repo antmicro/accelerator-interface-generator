@@ -1,15 +1,8 @@
 {
     "busConfiguration": "AXI_AXIL_AXI",
-    "dmaIn": {
-        "baseAddress": "0x43c00000"
-    },
-    "dmaOut": {
-        "baseAddress": "0x43c01000"
-    },
     "accelerator": {
         "sourceFile": "fpga_isp.v",
         "topName": "fpga_isp",
-        "baseAddress": "0x43c10000",
         "params": {
             "addrWidth": 32,
             "dataWidth": 32,
@@ -40,7 +33,7 @@
             {
                 "name": "FPGA_ISP",
                 "type": "storage",
-                "address": "0x43c10000",
+                "address": "0x0",
                 "fields": [
                     {
                         "name": "bgr",
@@ -71,7 +64,7 @@
             {
                 "name": "FPGA_ISP_IM",
                 "type": "storage",
-                "address": "0x43c10004",
+                "address": "0x4",
                 "fields": [
                     {
                         "name": "rows",

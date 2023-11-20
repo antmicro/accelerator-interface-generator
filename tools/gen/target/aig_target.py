@@ -356,7 +356,7 @@ class Config:
             params = "params"
             for comp in ["dmaIn", "dmaOut", "accelerator"]:
                 for width in ["dataWidth", "addrWidth", "controlDataWidth", "controlAddrWidth"]:
-                    if params in config[comp]:
+                    if comp in config and params in config[comp]:
                         self.__setattr__("_".join([comp.lower(),
                                                    width.lower()]),
                                          config[comp]["params"][width])
@@ -364,9 +364,6 @@ class Config:
                         self.__setattr__("_".join([comp.lower(),
                                                    width.lower()]),
                                          config['accelerator']["params"][width])
-
-                self.__setattr__("_".join([comp.lower(), "baseaddr"]),
-                                 int(config[comp]['baseAddress'], 16))
 
             self.bus_config = config["busConfiguration"]
             bus_in, bus_csr, bus_out = self.bus_config.split("_")
@@ -620,7 +617,7 @@ class AIGTarget:
         builder = self._var("builder", f"Builder(soc, output_dir={output_path})")
 
         content = [*parser, args, *update_args, *init_soc, builder,
-                   f'{self.indt(4)}builder.build(**parser.toolchain_argdict)']
+                   'builder.build(**parser.toolchain_argdict)']
 
         main_content = f"\n{self.indt(4)}".join(content)
 

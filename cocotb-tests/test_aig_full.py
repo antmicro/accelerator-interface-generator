@@ -222,9 +222,12 @@ async def run_test(dut):
         config = json.load(conf)
         cfg = config['busConfiguration'].split("_")
 
-    base_addr_dma_in = int(config["dmaIn"]["baseAddress"], 16)
-    base_addr_dma_out = int(config["dmaOut"]["baseAddress"], 16)
-    base_addr_acc = int(config["accelerator"]["baseAddress"], 16)
+    # Example base address for the AIG core
+    base_aig_addr = 0x43c00000
+    # Offsets of the components are reported during elaboration
+    base_addr_dma_in = base_aig_addr
+    base_addr_acc = base_aig_addr + 0x40
+    base_addr_dma_out = base_aig_addr + 0x80
     aig = AIGTestInterface(dut, cfg)
 
     assert (await aig.load_image(os.path.join(ROOT_DIR, "test-img.gray"), width, height) == 0)

@@ -10,8 +10,8 @@ import AIG.AIGConfig.AIGConfigUtils._
 class AXI4LiteCSRDecoder(addrWidth: Int, dataWidth: Int)
     extends AIGDecoder[AXI4Lite] {
 
-  def isCsr(addr: UInt, baseAddr: UInt, customCSRSize: UInt): Bool = {
-    (addr >= baseAddr) && (addr < (baseAddr + customCSRSize))
+  def isCsr(addr: UInt, baseAddr: UInt, csrSize: UInt): Bool = {
+    (addr >= baseAddr) && (addr < (baseAddr + csrSize))
   }
 
   def isReadOver(axiControl: AXI4Lite): Bool = {
@@ -22,9 +22,9 @@ class AXI4LiteCSRDecoder(addrWidth: Int, dataWidth: Int)
     (axiControl.b.bready && axiControl.b.bvalid)
   }
 
-  val baseCsrAddrIn = baseDMAInAddr
-  val baseCsrAddrOut = baseDMAOutAddr
-  val baseCsrAddrAcc = baseAccAddr
+  val baseCsrAddrIn = baseDMAInAddr.U
+  val baseCsrAddrOut = baseDMAOutAddr.U
+  val baseCsrAddrAcc = baseAccAddr.U
 
   val io = IO(new Bundle {
     val controlIn = new AXI4Lite(addrWidth, dataWidth)
@@ -127,7 +127,7 @@ class AXI4LiteCSRDecoder(addrWidth: Int, dataWidth: Int)
   switch(readState) {
     is(sIdleRead) {
       when(io.control.ar.arvalid) {
-        araddr := io.control.ar.araddr
+        araddr := io.control.ar.araddr(aigMaxAddrLen, 0)
         readState := sMuxRead
       }
     }
@@ -164,7 +164,7 @@ class AXI4LiteCSRDecoder(addrWidth: Int, dataWidth: Int)
   switch(writeState) {
     is(sIdleWrite) {
       when(io.control.aw.awvalid) {
-        awaddr := io.control.aw.awaddr
+        awaddr := io.control.aw.awaddr(aigMaxAddrLen, 0)
         writeState := sMuxWrite
       }
     }

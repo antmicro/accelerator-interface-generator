@@ -8,20 +8,20 @@ import AIG.AIGConfig.AIGConfigUtils._
 class WishboneCSRDecoder(addrWidth: Int, dataWidth: Int)
     extends AIGDecoder[WishboneSlave] {
 
-  val addrIn = baseDMAInAddr >> 2
-  val addrOut = baseDMAOutAddr >> 2
-  val addrAcc = baseAccAddr >> 2
+  val addrIn = (baseDMAInAddr >> 2).U
+  val addrOut = (baseDMAOutAddr >> 2).U
+  val addrAcc = (baseAccAddr >> 2).U
 
   val sNone :: sIn :: sOut :: sAcc :: Nil = Enum(4)
 
   def isCsr(addr_i: UInt, baseAddr: UInt, customCSRSize: UInt): Bool = {
-    (addr_i >= baseAddr) && (addr_i < (baseAddr + customCSRSize))
+    (addr_i >= baseAddr) && (addr_i < (baseAddr + customCSRSize / 4.U))
   }
   def isCsrIn(addr_i: UInt): Bool = {
-    isCsr(addr_i, addrIn, customCSRSize.U)
+    isCsr(addr_i, addrIn, dmaCSRSize.U)
   }
   def isCsrOut(addr_i: UInt): Bool = {
-    isCsr(addr_i, addrOut, customCSRSize.U)
+    isCsr(addr_i, addrOut, dmaCSRSize.U)
   }
   def isCsrAcc(addr_i: UInt): Bool = {
     isCsr(addr_i, addrAcc, customCSRSize.U)
@@ -82,7 +82,7 @@ class WishboneCSRDecoder(addrWidth: Int, dataWidth: Int)
     is(sIdle) {
       when(io.control.stb_i & io.control.cyc_i) {
         state := sAwaitAck
-        addr_i := io.control.adr_i
+        addr_i := io.control.adr_i(aigMaxAddrLen, 0)
         sel_i := io.control.sel_i
         we_i := io.control.we_i
         cyc_i := true.B

@@ -15,10 +15,10 @@ _reg_type_dict = {
 
 _valid_signal_fields = ["clock", "reset", "input", "output"]
 
-_required_dma_fields = ["baseAddress"]
+_required_dma_fields = []
 _allowed_dma_fields = _required_dma_fields + ["params"]
 
-_required_acc_fields = ["sourceFile", "topName", "baseAddress", "signals"]
+_required_acc_fields = ["sourceFile", "topName", "signals"]
 _allowed_acc_fields = _required_acc_fields + ["params", "csr"]
 
 _required_config_fields = ["busConfiguration", "accelerator"]

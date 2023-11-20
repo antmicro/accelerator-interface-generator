@@ -62,9 +62,9 @@ class ImageTransfer(dut: AIGTop) {
   val reader = new Axi4MemoryBfm(io.in_read, width * height, println)
   val writer = new Axi4MemoryBfm(io.out_write, width * height, println)
 
-  val dmaInAddr = baseDMAInAddr.litValue
-  val dmaOutAddr = baseDMAOutAddr.litValue
-  val accAddr = baseAccAddr.litValue
+  val dmaInAddr = baseDMAInAddr
+  val dmaOutAddr = baseDMAOutAddr
+  val accAddr = baseAccAddr
   println("Confiure registers")
 
   reader.loadFromFile("./test-img.gray")

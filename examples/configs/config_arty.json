@@ -1,15 +1,8 @@
 {
     "busConfiguration": "WB_WB_WB",
-    "dmaIn": {
-        "baseAddress": "0xa0000000"
-    },
-    "dmaOut": {
-        "baseAddress": "0xa0001000"
-    },
     "accelerator": {
         "sourceFile": "fpga_isp.v",
         "topName": "fpga_isp",
-        "baseAddress": "0xa0010000",
         "params": {
             "addrWidth": 32,
             "dataWidth": 32,
@@ -40,7 +33,7 @@
             {
                 "name": "FPGA_ISP",
                 "type": "storage",
-                "address": "0xa0010000",
+                "address": "0x0",
                 "fields": [
                     {
                         "name": "bgr",
@@ -71,7 +64,7 @@
             {
                 "name": "FPGA_ISP_IM",
                 "type": "storage",
-                "address": "0xa0010004",
+                "address": "0x4",
                 "fields": [
                     {
                         "name": "rows",
