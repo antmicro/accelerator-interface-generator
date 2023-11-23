@@ -43,6 +43,8 @@ __pycache__/
 
 dist/*
 target/
+# Except for target generating tools
+!tools/gen/target/
 lib_managed/
 src_managed/
 project/boot/
