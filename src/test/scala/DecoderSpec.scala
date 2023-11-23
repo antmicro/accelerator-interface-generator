@@ -77,9 +77,10 @@ class DecoderSpec extends AnyFlatSpec with ChiselScalatestTester {
   val componentNames =
     List("DMAIn CSR Bus", "DMAOut CSR Bus", "Accelerator CSR Bus")
   val baseAddresses = List(dmaInAddr, dmaOutAddr, accAddr)
+  val csrSizes = List(dmaCSRSize, dmaCSRSize, customCSRSize)
   val addrRanges =
-    baseAddresses.map(addr => (addr until addr + customCSRSize by (addrWidth / 8)))
-
+    (baseAddresses zip csrSizes).map{case (addr: Int, size: Int) => (addr until addr + size by (addrWidth / 8))}
+  print(addrRanges)
   for ((name, range) <- (componentNames zip addrRanges))
     for (addr <- range)
       it should s"initiate transfers for $name at address ${f"$addr%X"}" in
