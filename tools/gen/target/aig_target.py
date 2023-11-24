@@ -396,7 +396,7 @@ class Config:
                 dma_csr_size = dma_reg_cnt * (self.dmaout_controldatawidth / 8)
                 acc_csr_size = 0 if 'csr' not in config['accelerator'] else len(config['accelerator']['csr'])
                 aligned_csr_size = int(pow(2, ceil(log2(max(dma_csr_size, acc_csr_size)))))
-                self.aig_size = aligned_csr_size
+                self.aig_size = aligned_csr_size * 3
 
 class AIGTarget:
     BR = "\n\n"
