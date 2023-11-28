@@ -10,7 +10,7 @@ Accelerator Interface Generator is a tool that can connect any FPGA accelerator 
 ---
 Given an accelerator source code and configuration file, AIG is able to generate:
 - vendor independent DMA-Accelerator interface
-- LiteX Target
+- FPGA target device description with integrated AIG system
 
 ## Supported Configurations
 ---
@@ -31,21 +31,12 @@ Configuration file must be of structure:
 ```json
 {
     "busConfiguration": "busConfiguration",
-    
-    "DMAIn": {
-        "baseAddress": "dmaInAddr"
-    },
-    
-    "DMAOut": {
-        "baseAddress": "dmaOutAddr"
-    },
-    
+
     "Accelerator": {
-    
+
         "sourceFile": "acceleratorFilename",
         "topName": "acceleratorTopModule",
-        "baseAddress": "AcceleratorAddr",
-        
+
         "params": {
             "addrWidth": "addrWidth",
             "dataWidth": "dataWidth",
@@ -54,7 +45,7 @@ Configuration file must be of structure:
             "controlDataWidth": "controlDataWidth",
             "fifoDepth": "fifoDepth"
         },
-        
+
         "signals": {
             "clock": "clock",
             "reset": "reset",
@@ -73,7 +64,7 @@ Configuration file must be of structure:
                 "tlast": "tlast"
             }
         },
-        
+
         "csr": [
             {
                 "name": "csrName",
@@ -95,37 +86,36 @@ Configuration file must be of structure:
 }
 ```
 
-One can also precisely specify both DMA parameters by adding `"params"` field in `"DMAIn"` or `"DMAOut"`. 
+One can also precisely specify both DMAs by specifying `"params"` for `"DMAIn"` and `"DMAOut"`.
 
 For more information on configuration see the [documentation](https://antmicro.github.io/accelerator-interface-generator/Configuration.html).
 
 ## Synthesizable AIG verilog
 ---
-By default, the configuration file is `config.json` in project's root directory. 
+By default, the configuration file is `config.json` in project's root directory.
 
-Running:
+To produce a synthesizable AIG verilog run:
 ```
-make
+make verilog
 ```
 
-will result in generating remaining scala files (the Accelerator definition, optional CSRs) which then results in synthesizable `AIGTop.v` Accelerator-DMA system.
+Otherwise, path to the configuration file can be passed via `AIG_CONFIG`:
+```
+make verilog AIG_CONFIG=<path_to_config>
+```
 
-In order to specify a different configuration file, one must either:
-```
-make CONFIG_FILE=<path_to_config>
-```
-or run the generating scripts separately specifying the `--config-path` option.
+This will result in generating remaining scala files (the Accelerator definition, optional CSRs) which then results in synthesizable `AIGTop.v` Accelerator-DMA system.
 
 ## Source Code Structure
 ---
-- [src](src) -- AIG scala sources 
+- [src](src) -- AIG scala sources
 	- [main/scala](src/main/scala) -- chisel3 AIG implementation
-		- [Accelerator Integration](src/main/scala/AcceleratorIntegration) -- auto generated Accelerator definition & its integration 
+		- [Accelerator Integration](src/main/scala/AcceleratorIntegration) -- auto generated Accelerator definition & its integration
 		- [CSR](src/main/scala/CSR) -- definitions that allow for custom CSRs; some of which are auto generated
 		- [Decoder](src/main/scala/Decoder) -- implementations of Wishbone and AXI4Lite decoders
-	- [test](src/test) -- sample AIG chiseltest 
+	- [test](src/test) -- chiseltests
 	- [fastvdma-chisel](https://github.com/antmicro/fastvdma) -- FastVDMA submodule
 - [tools/gen](tools/gen) -- generating scripts
 	- [accelerator_integration](tools/gen/accelerator_integration) -- scripts parsing configuration file to Accelerator definitions and custom CSRs
-	- [litex](tools/gen/litex) -- scripts generating LiteX target with AIG system
+	- [target](tools/gen/target) -- scripts generating targets with AIG system
 - [cocotb-tests](cocotb-tests) -- configuration independent simulation for example Accelerator in cocotb
