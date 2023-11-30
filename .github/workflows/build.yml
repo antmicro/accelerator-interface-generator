@@ -24,7 +24,7 @@ jobs:
           pip3 install -r requirements.txt
 
       - name: Run Cocotb test
-        run: make cocotb_test CONFIG_FILE=examples/configs/config_zvb.json
+        run: make cocotb_test AIG_CONFIG=examples/configs/config_zvb.json
 
   docs:
     runs-on: ubuntu-latest
