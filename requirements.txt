@@ -1,5 +1,4 @@
 https://github.com/antmicro/antmicro-sphinx-utils/archive/main.zip
-GitPython==3.1.32
 cocotb-test==0.2.4
 cocotb==1.7.2
 cocotbext-axi==0.1.20
